@@ -1,0 +1,64 @@
+﻿using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
+using UnityEngine.Tilemaps;
+
+namespace RimCopy.IO
+{
+    public static class Files
+    {
+        /**
+         * Read contents of file Application.dataPath + path
+         */
+        public static string ReadContentsGameFolder(string path)
+        {
+            return ReadContentsGlobal(Application.dataPath + path);
+        }
+
+        public static string ReadContentsGlobal(string path)
+        {
+            if (!File.Exists(path))
+                return null;
+
+            return File.ReadAllText(path);
+        }
+
+        public static IEnumerable<(string, Tile)> ReadTiles(string path, int tileSize)
+        {
+            foreach (var file in Directory.GetFiles(path, "*\\.png"))
+                yield return (file, ReadTile("", tileSize, file));
+        }
+
+        public static Tile ReadTile(string path, int tileSize, string name)
+        {
+            var tile = ScriptableObject.CreateInstance<Tile>();
+
+            var texture2D = ReadTexture2D(path, name, tileSize);
+            tile.sprite = Sprite.Create(texture2D, new Rect(0, 0, tileSize, tileSize), new Vector2(0.5f, 0.5f), 100f,
+                0U,
+                SpriteMeshType.FullRect);
+            return tile;
+        }
+
+        public static Texture2D ReadTexture2D(string biomesFolder, string name, int tileSize)
+        {
+            var texture2D = new Texture2D(tileSize, tileSize);
+            var bytes = GetBytesGameFolder(biomesFolder + name + ".png");
+            texture2D.LoadImage(bytes);
+            return texture2D;
+        }
+
+        public static byte[] GetBytesGameFolder(string path)
+        {
+            return GetBytesGlobal(Application.dataPath + path);
+        }
+
+        private static byte[] GetBytesGlobal(string path)
+        {
+            if (!File.Exists(path))
+                return null;
+
+            return File.ReadAllBytes(path);
+        }
+    }
+}

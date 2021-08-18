@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24ef2942b7b049708dff7f862babeb1a, type: 3}
+  m_Name: Forest
+  m_EditorClassIdentifier: 
+  tiles:
+  - {fileID: 11400000, guid: 63d4e2ea65ed64147bdc947d0fa78b69, type: 2}
+  - {fileID: 11400000, guid: bf49ca2750c9cf74496d9fae9c960908, type: 2}
+  - {fileID: 11400000, guid: 011288929e1af084b8b75d4b95a60929, type: 2}
+  minHeight: 0.2
+  minMoisture: 0.4
+  minHeat: 0.4
