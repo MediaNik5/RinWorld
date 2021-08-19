@@ -88,6 +88,7 @@ Integration:
 - Fixed an initialization issue triggering legacy code generation.
 - Allow package source in assembly to be generated when referenced from asmref.
 
+
 ## [2.0.1] - 2020-03-19
 
 - When Visual Studio installation is compatible with C# 8.0, setup the language version to not prompt the user with

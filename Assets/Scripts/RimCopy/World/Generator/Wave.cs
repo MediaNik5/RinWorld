@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 
 namespace RimCopy.World.Generator
 {
@@ -12,7 +11,6 @@ namespace RimCopy.World.Generator
 
         public Wave(float seed, float frequency, float amplitude)
         {
-            Debug.Log($"Wave with seed {seed}, frequency {frequency}, amplitude {amplitude}");
             Seed = seed;
             Frequency = frequency;
             Amplitude = amplitude;

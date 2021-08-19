@@ -25,25 +25,43 @@ namespace RimCopy.IO
 
         public static IEnumerable<(string, Tile)> ReadTiles(string path, int tileSize)
         {
-            foreach (var file in Directory.GetFiles(path, "*\\.png"))
-                yield return (file, ReadTile("", tileSize, file));
+            foreach (var file in Directory.GetFiles(Application.dataPath + path, "*.png"))
+                yield return (ExtractName(file), ReadTile("", tileSize, file, true));
         }
 
-        public static Tile ReadTile(string path, int tileSize, string name)
+        private static string ExtractName(string file)
+        {
+            var withoutPath = file.Substring(file.LastIndexOf('/') + 1);
+            var name = withoutPath.Substring(0, withoutPath.LastIndexOf('.'));
+            return name;
+        }
+
+        public static Tile ReadTile(string path, int tileSize, string name, bool isGlobalPath = false)
         {
             var tile = ScriptableObject.CreateInstance<Tile>();
 
-            var texture2D = ReadTexture2D(path, name, tileSize);
-            tile.sprite = Sprite.Create(texture2D, new Rect(0, 0, tileSize, tileSize), new Vector2(0.5f, 0.5f), 100f,
+            var texture2D = ReadTexture2D(path, name, tileSize, isGlobalPath);
+            tile.sprite = Sprite.Create(
+                texture2D,
+                new Rect(0, 0, tileSize, tileSize),
+                new Vector2(0.5f, 0.5f),
+                100f,
                 0U,
                 SpriteMeshType.FullRect);
             return tile;
         }
 
-        public static Texture2D ReadTexture2D(string biomesFolder, string name, int tileSize)
+        public static Texture2D ReadTexture2D(string path, string name, int tileSize, bool isGlobalPath = false)
         {
             var texture2D = new Texture2D(tileSize, tileSize);
-            var bytes = GetBytesGameFolder(biomesFolder + name + ".png");
+            if (!name.EndsWith(".png"))
+                name += ".png";
+
+            byte[] bytes;
+            if (isGlobalPath)
+                bytes = GetBytesGlobal(path + name);
+            else
+                bytes = GetBytesGameFolder(path + name);
             texture2D.LoadImage(bytes);
             return texture2D;
         }

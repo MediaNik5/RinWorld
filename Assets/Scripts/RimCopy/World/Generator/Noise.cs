@@ -2,6 +2,10 @@
 
 namespace RimCopy.World.Generator
 {
+    /**
+     * Uses algorithm from this article
+     * https://coding.degree/procedural-2d-maps-unity-tutorial/
+     */
     public class Noise
     {
         public static float[,] Generate(int width, int height, Wave[] waves, float xOffset = 0f, float yOffset = 0f,

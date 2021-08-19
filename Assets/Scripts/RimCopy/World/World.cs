@@ -63,7 +63,8 @@ namespace RimCopy.World
 
         public void StartRender(Tilemap[] tilemaps)
         {
-            foreach (var cell in _cells) cell.StartRender(tilemaps);
+            foreach (var cell in _cells)
+                cell.StartRender(tilemaps);
         }
 
         public void Render(Tilemap[] tilemaps)

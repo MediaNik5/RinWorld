@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using RimCopy.Colony;
 using RimCopy.Exception;
@@ -18,6 +19,8 @@ namespace RimCopy.Data
         private static readonly Dictionary<string, ReliefPreset> reliefs = new Dictionary<string, ReliefPreset>();
 
         private static readonly Dictionary<string, Tile> utilTiles = new Dictionary<string, Tile>();
+
+        private static readonly Dictionary<string, KeyCode> keySet = new Dictionary<string, KeyCode>();
 
         public static JObject GetInfo(string str)
         {
@@ -39,16 +42,23 @@ namespace RimCopy.Data
             return colonies.ContainsKey((x, y)) ? colonies[(x, y)] : null;
         }
 
-        public static Tile getUtilTile(string name)
+        public static Tile GetUtilTile(string name)
         {
             return utilTiles[name];
+        }
+
+        public static KeyCode GetKeyCode(string action)
+        {
+            return keySet[action];
         }
 
         internal static class ConstantLoader
         {
             private const string ModsFolder = "/mods/";
             private const string ModsPriority = ModsFolder + "priority.json";
-            private const string UtilTilesFolder = "/util_tiles/";
+            private const string UtilFolder = "/util/";
+            private const string UtilTilesFolder = UtilFolder + "tiles/";
+            private const string Keys = UtilFolder + "keys.json";
             private const string BiomesFolder = "/biomes/";
             private const string ReliefsFolder = "/reliefs/";
             private const string Biomes = "biomes.json";
@@ -66,9 +76,31 @@ namespace RimCopy.Data
 
                 LoadModsPriority();
 
+                LoadKeystrokes();
                 LoadUtilTiles();
                 LoadBiomes();
                 LoadReliefs();
+            }
+
+            private static void LoadKeystrokes()
+            {
+                foreach (var mod in mods)
+                    LoadKeystrokes(mod);
+            }
+
+            private static void LoadKeystrokes(string mod)
+            {
+                var path = ModsFolder + mod + Keys;
+                var json = Files.ReadContentsGameFolder(path);
+                var jObject = JObject.Parse(json);
+
+                foreach (var jProperty in jObject)
+                {
+                    var parsed = Enum.TryParse(jProperty.Value.Value<string>(), out KeyCode keyCode);
+                    if (!parsed)
+                        throw new System.Exception($"Could not load key {jProperty.Key} for {jProperty.Value}");
+                    keySet.Add(jProperty.Key, keyCode);
+                }
             }
 
             private static void LoadUtilTiles()
@@ -117,7 +149,6 @@ namespace RimCopy.Data
 
             private static void LoadBiome(string biomesFolder, JObject jBiome)
             {
-                Debug.Log("Biome load");
                 var name = jBiome["name"].Value<string>();
                 var tile = Files.ReadTile(biomesFolder, CellSize, name);
 
