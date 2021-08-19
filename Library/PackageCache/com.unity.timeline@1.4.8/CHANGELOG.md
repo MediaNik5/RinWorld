@@ -36,15 +36,15 @@ on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - Fixed issue where changing a clip's extrapolation values would clear the current clip
   selection. ([936046](https://issuetracker.unity3d.com/product/unity/issues/guid/936046))
 - Fixed multiple issues related to the curves view:
-    - Fixed curve removal not functioning with `PlayableAsset`s (clips & tracks curves)
-      . ([1231002](https://issuetracker.unity3d.com/product/unity/issues/guid/1231002))
-    - Fixed inconsistent icon display on curves.
-    - Fixed incorrect ordering of properties. Properties now have a object/type/property ordering.
-    - Fixed unnecessary grouping of fields.
-    - Changed context menu from `Remove Properties` to `Remove Curves` to better reflect the change in functionality
-      between curves for GameObjects and curves for `PlayableAssets`.
-    - Fixed behaviour where removing a single field in a `Position`, `Rotation` or `Scale` group would remove the entire
-      group.
+  - Fixed curve removal not functioning with `PlayableAsset`s (clips & tracks curves)
+    . ([1231002](https://issuetracker.unity3d.com/product/unity/issues/guid/1231002))
+  - Fixed inconsistent icon display on curves.
+  - Fixed incorrect ordering of properties. Properties now have a object/type/property ordering.
+  - Fixed unnecessary grouping of fields.
+  - Changed context menu from `Remove Properties` to `Remove Curves` to better reflect the change in functionality
+    between curves for GameObjects and curves for `PlayableAssets`.
+  - Fixed behaviour where removing a single field in a `Position`, `Rotation` or `Scale` group would remove the entire
+    group.
 - Fixed case where pausing in Playmode and switching the active director in editor could pause the
   director. ([1263707](https://issuetracker.unity3d.com/product/unity/issues/guid/1263707))
 - Material properties are now displayed by their shader name in the curves view when
@@ -159,15 +159,15 @@ on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
   modules. ([1229825](https://issuetracker.unity3d.com/product/unity/issues/guid/1229825/))
 - Added an option in `TimelineAsset.EditorSettings` to disable scene preview.
 - Added base classes to define custom actions:
-    - `TimelineAction`
-    - `TrackAction`
-    - `ClipAction`
-    - `MarkerAction`
+  - `TimelineAction`
+  - `TrackAction`
+  - `ClipAction`
+  - `MarkerAction`
 - Added the following attributes that can be used with action classes:
-    - `ApplyDefaultUndo` to automatically manage undo operations.
-    - `ActiveInMode` to control in which Timeline mode the action is valid.
-    - `MenuEntry` to add the action to the context menu.
-    - `TimelineShortcut` can be added to a static method to invoke the action with a shortcut.
+  - `ApplyDefaultUndo` to automatically manage undo operations.
+  - `ActiveInMode` to control in which Timeline mode the action is valid.
+  - `MenuEntry` to add the action to the context menu.
+  - `TimelineShortcut` can be added to a static method to invoke the action with a shortcut.
 - `Invoker` to invoke actions using Timeline's selection or context.
 - `MenuOrder` contains menu priority values, to be used with `MenuEntry`.
 - `TimelineModes` to specify in which mode an action is valid, to be used with `MenuEntry`.

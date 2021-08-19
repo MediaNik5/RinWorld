@@ -23,7 +23,7 @@ namespace RimCopy
                 {
                     _stopwatch.Stop();
                     Debug.Log(
-                        $"The game completed {_gameState} and become {value} for {_stopwatch.ElapsedMilliseconds} ms.");
+                        $"The game completed {_gameState} and became {value} for {_stopwatch.ElapsedMilliseconds} ms.");
                     _stopwatch.Reset();
                     _stopwatch.Start();
                 }
