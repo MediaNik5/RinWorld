@@ -1,0 +1,44 @@
+[
+  {
+    "name": "desert",
+    "min_height": 0.2,
+    "min_moisture": 0,
+    "min_heat": 0.5
+  },
+  {
+    "name": "forest",
+    "min_height": 0.2,
+    "min_moisture": 0.4,
+    "min_heat": 0.4
+  },
+  {
+    "name": "grassland",
+    "min_height": 0.2,
+    "min_moisture": 0.5,
+    "min_heat": 0.3
+  },
+  {
+    "name": "jungle",
+    "min_height": 0.3,
+    "min_moisture": 0.5,
+    "min_heat": 0.62
+  },
+  {
+    "name": "mountains",
+    "min_height": 0.5,
+    "min_moisture": 0,
+    "min_heat": 0
+  },
+  {
+    "name": "ocean",
+    "min_height": 0,
+    "min_moisture": 0,
+    "min_heat": 0
+  },
+  {
+    "name": "tundra",
+    "min_height": 0.2,
+    "min_moisture": 0,
+    "min_heat": 0
+  }
+]
