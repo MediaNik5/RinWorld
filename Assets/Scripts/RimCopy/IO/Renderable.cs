@@ -1,8 +1,8 @@
 ﻿using UnityEngine.Tilemaps;
 
-namespace RimCopy.World
+namespace RimCopy.IO
 {
-    public interface Renderable
+    public interface IRenderable
     {
         /**
          * Being called first tick to render an object.

@@ -7,7 +7,7 @@ namespace RimCopy.World
     public class ReliefPreset : IComparable<ReliefPreset>
     {
         public readonly Tile Tile;
-        private readonly string name;
+        public readonly string name;
         private readonly float _minHeight;
 
         // Reflection

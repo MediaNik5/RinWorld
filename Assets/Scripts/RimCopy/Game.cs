@@ -12,35 +12,32 @@ namespace RimCopy
     public static class Game
     {
         private static GameState _gameState = GameState.Preparing;
-        private static Stopwatch _stopwatch;
+        private static readonly Stopwatch Stopwatch;
 
+        static Game()
+        {
+            Stopwatch = Stopwatch.StartNew();
+        }
         public static GameState GameState
         {
             get => _gameState;
             private set
             {
-                if (_stopwatch != null)
-                {
-                    _stopwatch.Stop();
-                    Debug.Log(
-                        $"The game completed {_gameState} and became {value} for {_stopwatch.ElapsedMilliseconds} ms.");
-                    _stopwatch.Reset();
-                    _stopwatch.Start();
-                }
-                else
-                {
-                    _stopwatch = Stopwatch.StartNew();
-                }
-
+                Stopwatch.Stop();
+                Debug.Log(
+                    $"The game completed {_gameState} and became {value} for {Stopwatch.ElapsedMilliseconds} ms.");
+                Stopwatch.Reset();
+                Stopwatch.Start();
                 _gameState = value;
             }
         }
 
-        private static World.World _world;
         private static Tilemap[] _tilemaps;
 
         public static int TilemapsLength =>
             _tilemaps.Length;
+
+        public static World.World World { get; private set; }
 
         public static Tilemap GetUtilTilemap()
         {
@@ -54,18 +51,26 @@ namespace RimCopy
 
         public static void StartGame()
         {
-            if (GameState != GameState.Preparing)
-                throw new InvalidStateException("The game is already launched.");
+            try
+            {
+                if (GameState != GameState.Preparing)
+                    throw new InvalidStateException("The game is already launched.");
 
-            GameState = GameState.LoadingConstants;
-            DataHolder.ConstantLoader.Load();
+                GameState = GameState.LoadingConstants;
+                DataHolder.Load();
 
-            GameState = GameState.Loading;
-            InitializeTilemaps();
-            _world = new World.World(100, 100, Random.Range(0, int.MaxValue));
-            _world.Initialize();
-            _world.StartRender(_tilemaps);
-            GameState = GameState.Playing;
+                GameState = GameState.Loading;
+                InitializeTilemaps();
+                World = new World.World(250, 250, Random.Range(0, int.MaxValue));
+                World.Initialize();
+                World.StartRender(_tilemaps);
+                GameState = GameState.Playing;
+            }
+            catch (System.Exception ex)
+            {
+                GameState = GameState.Corrupted;
+                throw new System.Exception("Exception occured.", ex);
+            }
         }
 
         private static void InitializeTilemaps()
@@ -74,6 +79,14 @@ namespace RimCopy
             Array.Sort(_tilemaps,
                 (e1, e2) => e2.GetComponent<TilemapRenderer>().sortOrder -
                             e1.GetComponent<TilemapRenderer>().sortOrder);
+        }
+
+        public static void SetPause(bool pause)
+        {
+            if (pause && GameState == GameState.Playing)
+                GameState = GameState.Paused;
+            else if (!pause && GameState == GameState.Paused)
+                GameState = GameState.Playing;
         }
     }
 
@@ -85,6 +98,7 @@ namespace RimCopy
         Loading,
         Saving,
         Playing,
-        Paused
+        Paused,
+        Corrupted
     }
 }

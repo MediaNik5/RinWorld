@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Newtonsoft.Json.Linq;
 using RimCopy.Colony;
 using RimCopy.Exception;
@@ -14,6 +15,7 @@ namespace RimCopy.Data
     {
         private static readonly Dictionary<string, JObject> info = new Dictionary<string, JObject>();
         private static readonly Dictionary<(int, int), ColonyInfo> colonies = new Dictionary<(int, int), ColonyInfo>();
+        private static readonly Dictionary<string, string> translation = new Dictionary<string, string>();
 
         private static readonly Dictionary<string, BiomePreset> biomes = new Dictionary<string, BiomePreset>();
         private static readonly Dictionary<string, ReliefPreset> reliefs = new Dictionary<string, ReliefPreset>();
@@ -21,6 +23,10 @@ namespace RimCopy.Data
         private static readonly Dictionary<string, Tile> utilTiles = new Dictionary<string, Tile>();
 
         private static readonly Dictionary<string, KeyCode> keySet = new Dictionary<string, KeyCode>();
+
+        private static readonly Dictionary<string, float> conditions = new Dictionary<string, float>();
+
+        public static string Language { get; private set; }
 
         public static JObject GetInfo(string str)
         {
@@ -52,13 +58,38 @@ namespace RimCopy.Data
             return keySet[action];
         }
 
-        internal static class ConstantLoader
+        public static float GetCondition(string condition)
+        {
+            return conditions[condition];
+        }
+
+        public static void Load()
+        {
+            ConstantLoader.Load();
+        }
+
+        public static void SetLanguage(string language)
+        {
+            Files.WriteContentsGameFolder(ConstantLoader.Language, $"{{\n\t\"language\": \"{language}\"\n}}");
+            ConstantLoader.LoadLanguage();
+            ConstantLoader.LoadTranslations();
+        }
+
+        public static string Translate(string key)
+        {
+            return translation.ContainsKey(key) ? translation[key] : key;
+        }
+
+        private static class ConstantLoader
         {
             private const string ModsFolder = "/mods/";
             private const string ModsPriority = ModsFolder + "priority.json";
             private const string UtilFolder = "/util/";
             private const string UtilTilesFolder = UtilFolder + "tiles/";
+            private const string Conditions = "/conditions.json";
             private const string Keys = UtilFolder + "keys.json";
+            public const string Language = "/language.json";
+            private const string LanguagesFolder = "/languages/";
             private const string BiomesFolder = "/biomes/";
             private const string ReliefsFolder = "/reliefs/";
             private const string Biomes = "biomes.json";
@@ -66,7 +97,7 @@ namespace RimCopy.Data
 
             public const int CellSize = 2048;
 
-            private static string[] mods;
+            private static string[] _mods;
 
             public static void Load()
             {
@@ -76,15 +107,59 @@ namespace RimCopy.Data
 
                 LoadModsPriority();
 
+                LoadLanguage();
+                LoadTranslations();
+                
                 LoadKeystrokes();
+                LoadConditions();
                 LoadUtilTiles();
                 LoadBiomes();
                 LoadReliefs();
             }
 
+            public static void LoadLanguage()
+            {
+                var jsonLanguage = Files.ReadContentsGameFolder(Language);
+                if (jsonLanguage == null)
+                {
+                    DataHolder.Language = CultureInfo.CurrentUICulture.Name;
+                    Files.WriteContentsGameFolder(Language, $"{{\n\t\"language\": \"{DataHolder.Language}\"\n}}");
+                }
+                else
+                {
+                    DataHolder.Language = JObject.Parse(jsonLanguage)["language"].Value<string>();
+                }
+
+                CheckLanguageSupport();
+            }
+
+            private static void CheckLanguageSupport()
+            {
+                if (!Files.FileGameFolderExists(ModsFolder + "core" + LanguagesFolder + DataHolder.Language + ".json"))
+                {
+                    DataHolder.Language = "en-US";
+                    Files.WriteContentsGameFolder(Language, "{\n\t\"language\": \"en-US\"\n}");
+                }
+            }
+
+            public static void LoadTranslations()
+            {
+                foreach (var mod in _mods)
+                    LoadTranslations(mod);
+            }
+
+            private static void LoadTranslations(string mod)
+            {
+                var languageSet =
+                    Files.ReadContentsGameFolder(ModsFolder + mod + LanguagesFolder + DataHolder.Language + ".json");
+                var jLanguageSet = JObject.Parse(languageSet);
+                foreach (var jProperty in jLanguageSet)
+                    translation.Add(jProperty.Key, jProperty.Value.Value<string>());
+            }
+
             private static void LoadKeystrokes()
             {
-                foreach (var mod in mods)
+                foreach (var mod in _mods)
                     LoadKeystrokes(mod);
             }
 
@@ -103,9 +178,25 @@ namespace RimCopy.Data
                 }
             }
 
+            private static void LoadConditions()
+            {
+                foreach (var mod in _mods)
+                    LoadConditions(mod);
+            }
+
+            private static void LoadConditions(string mod)
+            {
+                var path = ModsFolder + mod + Conditions;
+                var json = Files.ReadContentsGameFolder(path);
+                var jObject = JObject.Parse(json);
+
+                foreach (var jCondition in jObject)
+                    conditions.Add(jCondition.Key, jCondition.Value.Value<float>());
+            }
+
             private static void LoadUtilTiles()
             {
-                foreach (var mod in mods)
+                foreach (var mod in _mods)
                     LoadUtilTiles(mod);
             }
 
@@ -121,19 +212,19 @@ namespace RimCopy.Data
                 var priority = Files.ReadContentsGameFolder(ModsPriority);
                 if (string.IsNullOrEmpty(priority))
                 {
-                    mods = new[] {"core"};
+                    _mods = new[] {"core"};
                     return;
                 }
 
                 var jArray = JArray.Parse(priority);
-                mods = new string[jArray.Count];
-                for (var i = 0; i < mods.Length; i++)
-                    mods[i] = jArray[i].Value<string>();
+                _mods = new string[jArray.Count];
+                for (var i = 0; i < _mods.Length; i++)
+                    _mods[i] = jArray[i].Value<string>();
             }
 
             private static void LoadBiomes()
             {
-                foreach (var mod in mods)
+                foreach (var mod in _mods)
                     LoadBiomes(mod);
             }
 
@@ -165,7 +256,7 @@ namespace RimCopy.Data
 
             private static void LoadReliefs()
             {
-                foreach (var mod in mods)
+                foreach (var mod in _mods)
                     LoadReliefs(mod);
             }
 

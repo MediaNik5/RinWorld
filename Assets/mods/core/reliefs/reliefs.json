@@ -1,18 +1,18 @@
 [
   {
-    "name": "flat",
+    "name": "Flat",
     "min_height": 0
   },
   {
-    "name": "high_ground",
-    "min_height": 0.2
+    "name": "High ground",
+    "min_height": 0.6
   },
   {
-    "name": "hills",
-    "min_height": 0.5
-  },
-  {
-    "name": "mountains",
+    "name": "Hills",
     "min_height": 0.7
+  },
+  {
+    "name": "Mountains",
+    "min_height": 0.8
   }
 ]

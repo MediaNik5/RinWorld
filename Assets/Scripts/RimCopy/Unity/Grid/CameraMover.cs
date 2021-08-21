@@ -25,6 +25,9 @@ namespace RimCopy.Unity.Grid
 
         private void Update()
         {
+            if (Game.GameState != GameState.Playing)
+                return;
+            
             if (Input.GetKeyDown(DataHolder.GetKeyCode(MoveMouse)))
                 InitMovingTowardsMousePointer();
 

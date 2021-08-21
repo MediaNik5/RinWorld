@@ -1,0 +1,9 @@
+{
+  "MaxMeanTemperature": 40,
+  "MinMeanTemperature": -40,
+  "MaxMoistureAddition": 30,
+  "MoistureMultiplier": 14,
+  "MoistureExponent": 4,
+  "MoistureShift": -10,
+  "HeightShift": 20
+}

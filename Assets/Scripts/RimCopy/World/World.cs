@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using RimCopy.Attribute;
+using RimCopy.IO;
 using RimCopy.World.Generator;
 using UnityEngine.Tilemaps;
 
 namespace RimCopy.World
 {
-    public class World : Unit, Renderable
+    public class World : Unit, IRenderable
     {
         [DontSave] private const int WaveNumber = 2;
         private readonly int _seed;
@@ -25,6 +27,12 @@ namespace RimCopy.World
             _height = height;
             _seed = seed;
         }
+
+        public IEnumerable<(string, string)> GetCellInfo(int x, int y)
+        {
+            return _cells[x, y].GetInfo();
+        }
+        
 
         public override void Initialize()
         {
