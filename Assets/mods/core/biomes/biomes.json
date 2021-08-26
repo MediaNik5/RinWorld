@@ -1,44 +1,214 @@
 [
+    {
+    "name": "Plain",
+    "min_height": 0.4,
+    "min_moisture": 0.4,
+    "min_heat": 0.7,
+    "max_height": 0.6,
+    "max_moisture": 1,
+    "max_heat": 1,
+    "points": [
+      {
+        "name": "Oasis",
+        "min_height": 0,
+        "min_worth": 0.5,
+        "min_presence": 0.5,
+        "floor": "Water"
+      },
+      {
+        "name": "Sands",
+        "min_height": 0,
+        "min_worth": 0,
+        "min_presence": 0,
+        "floor": "Sands"
+      }
+    ]
+  },
   {
     "name": "Desert",
     "min_height": 0,
     "min_moisture": 0,
-    "min_heat": 0.7
+    "min_heat": 0.5,
+    "max_height": 0.7,
+    "max_moisture": 0.4,
+    "max_heat": 1,
+    "points": [
+      {
+        "name": "Oasis",
+        "min_height": 0,
+        "min_worth": 0.5,
+        "min_presence": 0.5,
+        "floor": "Water"
+      },
+      {
+        "name": "Sands",
+        "min_height": 0,
+        "min_worth": 0,
+        "min_presence": 0,
+        "floor": "Sands"
+      }
+    ]
   },
   {
     "name": "Forest",
     "min_height": 0.2,
-    "min_moisture": 0.4,
-    "min_heat": 0.2
+    "min_moisture": 0.3,
+    "min_heat": 0.3,
+    "max_height": 0.6,
+    "max_moisture": 0.8,
+    "max_heat": 0.6,
+    "points": [
+      {
+        "name": "Sands",
+        "min_height": 0,
+        "min_worth": 0,
+        "min_presence": 0,
+        "floor": "Sands"
+      }
+    ]
   },
   {
     "name": "Grassland",
     "min_height": 0.1,
-    "min_moisture": 0.5,
-    "min_heat": 0.3
+    "min_moisture": 0.4,
+    "min_heat": 0.4,
+    "max_height": 0.4,
+    "max_moisture": 0.9,
+    "max_heat": 0.6,
+    "points": [
+      {
+        "name": "Sands",
+        "min_height": 0,
+        "min_worth": 0,
+        "min_presence": 0,
+        "floor": "Sands"
+      }
+    ]
   },
   {
     "name": "Jungle",
     "min_height": 0.1,
     "min_moisture": 0.6,
-    "min_heat": 0.5
+    "min_heat": 0.4,
+    "max_height": 0.6,
+    "max_moisture": 1,
+    "max_heat": 0.8,
+    "points": [
+      {
+        "name": "Sands",
+        "min_height": 0,
+        "min_worth": 0,
+        "min_presence": 0,
+        "floor": "Sands"
+      }
+    ]
+  },
+  {
+    "name": "Swamp",
+    "min_height": 0,
+    "min_moisture": 0.4,
+    "min_heat": 0.4,
+    "max_height": 0.6,
+    "max_moisture": 1,
+    "max_heat": 1,
+    "points": [
+      {
+        "name": "Sands",
+        "min_height": 0,
+        "min_worth": 0,
+        "min_presence": 0,
+        "floor": "Sands"
+      }
+    ]
   },
   {
     "name": "Rocks",
     "min_height": 0.6,
     "min_moisture": 0,
-    "min_heat": 0
+    "min_heat": 0,
+    "max_height": 1,
+    "max_moisture": 1,
+    "max_heat": 1,
+    "points": [
+      {
+        "name": "Sands",
+        "min_height": 0,
+        "min_worth": 0,
+        "min_presence": 0,
+        "floor": "Sands"
+      }
+    ]
   },
   {
     "name": "Ocean",
     "min_height": 0,
     "min_moisture": 0,
-    "min_heat": 0
+    "min_heat": 0.4,
+    "max_height": 0.4,
+    "max_moisture": 1,
+    "max_heat": 0.7,
+    "points": [
+      {
+        "name": "Sands",
+        "min_height": 0,
+        "min_worth": 0,
+        "min_presence": 0,
+        "floor": "Sands"
+      }
+    ]
   },
   {
     "name": "Tundra",
     "min_height": 0.2,
     "min_moisture": 0,
-    "min_heat": 0.1
+    "min_heat": 0.2,
+    "max_height": 0.6,
+    "max_moisture": 0.3,
+    "max_heat": 0.5,
+    "points": [
+      {
+        "name": "Sands",
+        "min_height": 0,
+        "min_worth": 0,
+        "min_presence": 0,
+        "floor": "Sands"
+      }
+    ]
+  },
+  {
+    "name": "Ice",
+    "min_height": 0,
+    "min_moisture": 0,
+    "min_heat": 0,
+    "max_height": 1,
+    "max_moisture": 1,
+    "max_heat": 0.2,
+    "points": [
+      {
+        "name": "Ice",
+        "min_height": 0,
+        "min_worth": 0,
+        "min_presence": 0,
+        "floor": "Ice"
+      }
+    ]
+  },
+  {
+    "name": "Snow",
+    "min_height": 0,
+    "min_moisture": 0,
+    "min_heat": 0.2,
+    "max_height": 1,
+    "max_moisture": 1,
+    "max_heat": 0.4,
+    "points": [
+      {
+        "name": "Ice",
+        "min_height": 0,
+        "min_worth": 0,
+        "min_presence": 0,
+        "floor": "Ice"
+      }
+    ]
   }
 ]

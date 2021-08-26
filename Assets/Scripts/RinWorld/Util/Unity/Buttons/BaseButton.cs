@@ -1,0 +1,55 @@
+﻿using RinWorld.Util.Data;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace RinWorld.Util.Unity.Buttons
+{
+    public class BaseButton
+    {
+        private readonly string _name;
+        private Button _cancel;
+        protected Button _confirm;
+        private Text _header;
+
+        protected GameObject _popup;
+
+        public Button MainMenuButton { get; private set; }
+
+        protected BaseButton(string name)
+        {
+            _name = name;
+        }
+
+        public virtual void Init(Transform menuTransform)
+        {
+            MainMenuButton = menuTransform.Find(_name).GetComponent<Button>();
+            MainMenuButton.onClick.AddListener(OnClick);
+
+            var exitPopupTransform = menuTransform.Find($"{_name} popup");
+            _popup = exitPopupTransform.gameObject;
+
+            _confirm = exitPopupTransform.Find("Confirm").GetComponent<Button>();
+            _cancel = exitPopupTransform.Find("Cancel").GetComponent<Button>();
+            _cancel.onClick.AddListener(() => _popup.SetActive(false));
+            _header = exitPopupTransform.Find("Header").GetComponent<Text>();
+        }
+
+        public virtual void Update()
+        {
+            SetTranslation(MainMenuButton, _name);
+            SetTranslation(_confirm, "Confirm");
+            SetTranslation(_cancel, "Cancel");
+            _header.text = DataHolder.Translate($"{_name} header");
+        }
+
+        protected virtual void OnClick()
+        {
+            _popup.SetActive(true);
+        }
+
+        public static void SetTranslation(Component obj, string name)
+        {
+            obj.transform.Find("Text").GetComponent<Text>().text = DataHolder.Translate(name);
+        }
+    }
+}

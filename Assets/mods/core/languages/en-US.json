@@ -16,5 +16,21 @@
 	"Mean temperature": "Mean temperature",
 	"Min temperature": "Min temperature",
 	"Average moisture": "Average moisture",
-	"Exit the game": "Exit the game"
+	"New game": "New game",
+	"Load game": "Load game",
+	"Save game": "Save game",
+	"Settings": "Settings",
+	"Exit": "Exit",
+	"Menu": "Menu",
+	"Confirm": "Confirm",
+	"Cancel": "Cancel",
+	"New game header": "New game",
+	"Load game header": "Load game",
+	"Save game header": "Save game",
+	"Settings header": "Settings",
+	"Exit header": "Are you sure you want to exit?",
+	"Seed": "Seed",
+	"Swamp": "Swamp",
+	"Snow": "Snow",
+	"Ice": "Ice"
 }
