@@ -1,12 +1,13 @@
-﻿using RinWorld.Util.Data;
+﻿using System;
+using RinWorld.Util.Data;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace RinWorld.Util.Unity.Buttons
 {
-    public class BaseButton
+    public abstract class BaseButton
     {
-        private readonly string _name;
+        public readonly string name;
         private Button _cancel;
         protected Button _confirm;
         private Text _header;
@@ -17,15 +18,15 @@ namespace RinWorld.Util.Unity.Buttons
 
         protected BaseButton(string name)
         {
-            _name = name;
+            this.name = name;
         }
 
         public virtual void Init(Transform menuTransform)
         {
-            MainMenuButton = menuTransform.Find(_name).GetComponent<Button>();
+            MainMenuButton = menuTransform.Find(name).GetComponent<Button>();
             MainMenuButton.onClick.AddListener(OnClick);
 
-            var exitPopupTransform = menuTransform.Find($"{_name} popup");
+            var exitPopupTransform = menuTransform.Find($"{name} popup");
             _popup = exitPopupTransform.gameObject;
 
             _confirm = exitPopupTransform.Find("Confirm").GetComponent<Button>();
@@ -36,10 +37,10 @@ namespace RinWorld.Util.Unity.Buttons
 
         public virtual void Update()
         {
-            SetTranslation(MainMenuButton, _name);
+            SetTranslation(MainMenuButton, name);
             SetTranslation(_confirm, "Confirm");
             SetTranslation(_cancel, "Cancel");
-            _header.text = DataHolder.Translate($"{_name} header");
+            _header.text = DataHolder.Translate($"{name} header");
         }
 
         protected virtual void OnClick()
@@ -49,7 +50,14 @@ namespace RinWorld.Util.Unity.Buttons
 
         public static void SetTranslation(Component obj, string name)
         {
-            obj.transform.Find("Text").GetComponent<Text>().text = DataHolder.Translate(name);
+            try
+            {
+                obj.transform.Find("Text").GetComponent<Text>().text = DataHolder.Translate(name);
+            }
+            catch (NullReferenceException ex)
+            {
+                Debug.Log("Null");
+            }
         }
     }
 }

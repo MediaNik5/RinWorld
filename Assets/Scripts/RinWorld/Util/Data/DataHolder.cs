@@ -54,6 +54,7 @@ namespace RinWorld.Util.Data
 
         public static Unit GetUnit(string name)
         {
+            Debug.Log(name);
             return units[name];
         }
 

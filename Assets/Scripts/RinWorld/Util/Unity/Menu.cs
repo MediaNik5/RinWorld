@@ -1,4 +1,5 @@
-﻿using RinWorld.Util.Data;
+﻿using System;
+using RinWorld.Util.Data;
 using RinWorld.Util.Unity.Buttons;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,7 +23,16 @@ namespace RinWorld.Util.Unity
             _menu = menuTransform.gameObject;
 
             foreach (var button in Buttons())
-                button.Init(menuTransform);
+            {
+                try
+                {
+                    button.Init(menuTransform);
+                }
+                catch (NullReferenceException)
+                {
+                    Debug.LogError($"Button {button.name} is not ready");
+                }
+            }
 
 
             if (Game.GameState == GameState.Menu)
@@ -51,7 +61,10 @@ namespace RinWorld.Util.Unity
             Game.SetPause(true);
             _menu.SetActive(true);
             foreach (var button in Buttons())
-                button.Update();
+                try
+                {
+                    button.Update();
+                }catch(NullReferenceException){}
 
             _header.text = DataHolder.Translate("Menu");
         }
