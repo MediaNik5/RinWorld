@@ -1,5 +1,6 @@
 ﻿using System;
 using RinWorld.Util.Data;
+using RinWorld.Util.Unity;
 using UnityEngine.Tilemaps;
 
 namespace RinWorld.World
@@ -8,16 +9,11 @@ namespace RinWorld.World
     {
         private readonly float _minHeight;
         public readonly string name;
-        public readonly Tile Tile;
+        public readonly ImmutableTile tile;
 
-        // Reflection
-        private ReliefPreset()
+        public ReliefPreset(ImmutableTile tile, string name, float minHeight)
         {
-        }
-
-        public ReliefPreset(Tile tile, string name, float minHeight)
-        {
-            Tile = tile;
+            this.tile = tile;
             this.name = name;
             _minHeight = minHeight;
         }

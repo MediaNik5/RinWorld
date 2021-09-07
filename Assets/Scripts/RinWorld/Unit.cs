@@ -74,11 +74,17 @@ namespace RinWorld
             {
                 var method = type.GetMethod("Of", BindingFlags.Static | BindingFlags.NonPublic);
 
-                if (method != null)
+                if (method != null &&
+                    method.ReturnType == typeof(Unit) && 
+                    method.GetParameters().Length == 1 &&
+                    method.GetParameters()[0].ParameterType == typeof(JObject))
+                {
                     creators.Add(
                         type.Name,
                         Delegate.CreateDelegate(typeof(Func<JObject, Unit>), null, method) as Func<JObject, Unit>
                     );
+                }
+
             }
         }
 

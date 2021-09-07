@@ -1,19 +1,20 @@
 ﻿using Newtonsoft.Json.Linq;
 using RinWorld.Util.Data;
+using RinWorld.Util.Unity;
 using UnityEngine.Tilemaps;
 
 namespace RinWorld.Buildings
 {
     public class Floor : Building
     {
-        public const int Layer = 1;
+        public new const int Layer = 1;
 
-        public Floor(string name, Tile tile, bool canGoThrough, float goThroughRate) : base(name, tile, canGoThrough,
+        public Floor(string name, ImmutableTile tile, bool canGoThrough, float goThroughRate) : base(name, tile, canGoThrough,
             goThroughRate)
         {
         }
 
-        private static Unit Of(JObject jObject)
+        private new static Unit Of(JObject jObject)
         {
             return new Floor(
                 jObject["name"].Value<string>(),

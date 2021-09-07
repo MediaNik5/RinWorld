@@ -12,10 +12,10 @@ namespace RinWorld.Util.Unity.Grid
         private GameObject _cellInfoPane;
         private Button _play;
         private UnityEngine.Grid _grid;
-        private Tile _hover;
+        private ImmutableTile _hover;
         private Vector3Int _previousMousePosition;
         private Vector3Int _previousSelection = new Vector3Int(int.MinValue, 0, 0);
-        private Tile _select;
+        private ImmutableTile _select;
         private Tilemap _util;
 
         private void Start()
@@ -41,14 +41,14 @@ namespace RinWorld.Util.Unity.Grid
             {
                 if (_previousMousePosition != _previousSelection)
                     _util.SetTile(_previousMousePosition, null);
-                _util.SetTile(mousePosition, _hover);
+                _hover.ApplyFor(_util, mousePosition);
                 _previousMousePosition = mousePosition;
             }
 
             if (mousePosition != _previousSelection && Input.GetMouseButtonDown(0))
             {
                 _util.SetTile(_previousSelection, null);
-                _util.SetTile(mousePosition, _select);
+                _select.ApplyFor(_util, mousePosition);
                 _previousSelection = mousePosition;
                 ShowCellInfo(mousePosition.x, mousePosition.y);
             }

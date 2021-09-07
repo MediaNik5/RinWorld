@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using RinWorld.Util;
 using RinWorld.Util.Attribute;
 using RinWorld.Util.Data;
 using RinWorld.Util.IO;
@@ -54,8 +55,8 @@ namespace RinWorld.World
             _height = Mathf.Clamp(height, 0f, 1f);
             _moisture = Mathf.Clamp(moisture, 0f, 1f);
             _heat = Mathf.Clamp(heat, 0f, 1f);
-            meanTemperature = BiomePreset.MeanTemperature(heat, moisture, height);
-            var deltaTemperature = BiomePreset.DeltaTemperature(moisture);
+            meanTemperature = MathHelper.MeanTemperature(heat, moisture, height);
+            var deltaTemperature = MathHelper.DeltaTemperature(moisture);
             maxTemperature = meanTemperature + deltaTemperature;
             minTemperature = meanTemperature - deltaTemperature;
 
@@ -71,8 +72,8 @@ namespace RinWorld.World
         {
             try
             {
-                tilemaps[0].SetTile(new Vector3Int(x, y, 0), _biome.tile);
-                tilemaps[1].SetTile(new Vector3Int(x, y, 0), _relief.Tile);
+                _biome.tile.ApplyFor(tilemaps[0], x, y);
+                _relief.tile.ApplyFor(tilemaps[1], x, y);
             }
             catch (NullReferenceException ex)
             {
@@ -104,7 +105,7 @@ namespace RinWorld.World
             yield return ("Max temperature", maxTemperature.ToString("F1"));
             yield return ("Mean temperature", meanTemperature.ToString("F1"));
             yield return ("Min temperature", minTemperature.ToString("F1"));
-            yield return ("Average moisture", (int) (50 * (1 + BiomePreset.Distribution(_moisture))) + "%");
+            yield return ("Average moisture", (int) (50 * (1 + MathHelper.Distribution(_moisture))) + "%");
 #if UNITY_EDITOR
             yield return ("Heat value", _heat.ToString("F1"));
             yield return ("Moisture value", _moisture.ToString("F1"));

@@ -35,8 +35,9 @@ namespace RinWorld.World
             if (_worth >= 0.5f && _presence >= 0.5f)
                 Debug.Log("More");
 
-            _building = biome.PointFor(_height, _worth, _presence).Building;
-            _floor = biome.PointFor(_height, _worth, _presence).Floor;
+            var pointPreset = biome.PointFor(_height, _worth, _presence);
+            _building = pointPreset.Building;
+            _floor = pointPreset.Floor;
         }
 
         public static Point Of(int x, int y, BiomePreset biome, float height, float worth, float presence)
@@ -46,8 +47,8 @@ namespace RinWorld.World
 
         public void StartRender(Tilemap[] tilemaps)
         {
-            tilemaps[Floor.Layer].SetTile(_position, _floor?.Tile);
-            tilemaps[Building.Layer].SetTile(_position, _building?.Tile);
+            _floor?.Tile.ApplyFor(tilemaps[Floor.Layer], _position);
+            _building?.Tile.ApplyFor(tilemaps[Building.Layer], _position);
         }
 
         public void Render(Tilemap[] tilemaps)
@@ -55,9 +56,9 @@ namespace RinWorld.World
             if (!changed)
                 return;
 
-            tilemaps[Building.Layer].SetTile(_position, _building?.Tile);
-            tilemaps[Floor.Layer].SetTile(_position, _floor?.Tile);
-            tilemaps[Thing.Layer].SetTile(_position, _thing?.tile);
+            _building?.Tile.ApplyFor(tilemaps[Building.Layer], _position);
+            _floor?.Tile.ApplyFor(tilemaps[Floor.Layer], _position);
+            _thing?.tile.ApplyFor(tilemaps[Thing.Layer], _position);
         }
     }
 }

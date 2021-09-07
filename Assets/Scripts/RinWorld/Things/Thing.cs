@@ -1,4 +1,5 @@
-﻿using UnityEngine.Tilemaps;
+﻿using RinWorld.Util.Unity;
+using UnityEngine.Tilemaps;
 
 namespace RinWorld.Things
 {
@@ -7,6 +8,6 @@ namespace RinWorld.Things
         public const int Layer = 2;
 
         private string _name;
-        public readonly Tile tile;
+        public readonly ImmutableTile tile;
     }
 }

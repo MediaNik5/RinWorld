@@ -1,4 +1,5 @@
-﻿using UnityEngine.Tilemaps;
+﻿using RinWorld.Util.Unity;
+using UnityEngine.Tilemaps;
 
 namespace RinWorld.Buildings
 {
@@ -7,10 +8,10 @@ namespace RinWorld.Buildings
         public const int Layer = 0;
 
         private readonly string _name;
-        public readonly Tile Tile;
+        public readonly ImmutableTile Tile;
         public readonly bool CanGoThrough;
 
-        public Building(string name, Tile tile, bool canGoThrough, float goThroughRate)
+        public Building(string name, ImmutableTile tile, bool canGoThrough, float goThroughRate)
         {
             _name = name;
             Tile = tile;

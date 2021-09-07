@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using RinWorld.Buildings;
 using RinWorld.Util.Exception;
 using RinWorld.Util.IO;
+using RinWorld.Util.Unity;
 using RinWorld.World;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -19,51 +20,29 @@ namespace RinWorld.Util.Data
         private static readonly Dictionary<string, BiomePreset> biomes = new Dictionary<string, BiomePreset>();
         private static readonly Dictionary<string, ReliefPreset> reliefs = new Dictionary<string, ReliefPreset>();
 
-        private static readonly Dictionary<string, Tile> tiles = new Dictionary<string, Tile>();
-        private static readonly Dictionary<string, Tile> utilTiles = new Dictionary<string, Tile>();
+        private static readonly Dictionary<string, ImmutableTile> tiles = new Dictionary<string, ImmutableTile>();
+        private static readonly Dictionary<string, ImmutableTile> utilTiles = new Dictionary<string, ImmutableTile>();
 
         private static readonly Dictionary<string, KeyCode> keySet = new Dictionary<string, KeyCode>();
 
         private static readonly Dictionary<string, float> conditions = new Dictionary<string, float>();
 
         private static readonly Dictionary<string, Unit> units = new Dictionary<string, Unit>();
-        private static readonly Tile defaultTile = ScriptableObject.CreateInstance<Tile>();
-
-        static DataHolder()
-        {
-            var texture2D = new Texture2D(ConstantLoader.TileSize, ConstantLoader.TileSize);
-            for (var x = 0; x < ConstantLoader.TileSize; x++)
-            for (var y = 0; y < ConstantLoader.TileSize; y++)
-            {
-                var color = x / 64 + y / 64;
-                texture2D.SetPixel(x, y, color % 2 == 1 ? Color.black : Color.yellow);
-            }
-
-            texture2D.Apply();
-            defaultTile.sprite = Sprite.Create(
-                texture2D,
-                new Rect(0, 0, ConstantLoader.TileSize, ConstantLoader.TileSize),
-                new Vector2(0.5f, 0.5f),
-                100f,
-                0U,
-                SpriteMeshType.FullRect
-            );
-        }
+        private static readonly ImmutableTile DefaultTile = new ImmutableTile(ConstantLoader.DefaultTile);
 
         public static string Language { get; private set; }
 
         public static Unit GetUnit(string name)
         {
-            Debug.Log(name);
             return units[name];
         }
 
-        public static Tile GetTile(string name)
+        public static ImmutableTile GetTile(string name)
         {
             if (tiles.ContainsKey(name))
                 return tiles[name];
-            Debug.LogError($"Tile {name} was not found.");
-            return defaultTile;
+            Debug.LogError($"Tile {name} was not found, using default tile instead.");
+            return DefaultTile;
         }
 
         public static ICollection<BiomePreset> GetAllBiomes()
@@ -76,7 +55,7 @@ namespace RinWorld.Util.Data
             return reliefs.Values;
         }
 
-        public static Tile GetUtilTile(string name)
+        public static ImmutableTile GetUtilTile(string name)
         {
             return utilTiles[name];
         }
@@ -130,6 +109,32 @@ namespace RinWorld.Util.Data
 
             private static string[] _mods;
 
+            public static Tile DefaultTile
+            {
+                get
+                {
+                    Tile defaultTile = ScriptableObject.CreateInstance<Tile>();
+                    var texture2D = new Texture2D(TileSize, TileSize);
+                    for (var x = 0; x < TileSize; x++)
+                    for (var y = 0; y < TileSize; y++)
+                    {
+                        var color = x / 64 + y / 64;
+                        texture2D.SetPixel(x, y, color % 2 == 1 ? Color.black : Color.yellow);
+                    }
+
+                    texture2D.Apply();
+                    defaultTile.sprite = Sprite.Create(
+                        texture2D,
+                        new Rect(0, 0, TileSize, TileSize),
+                        new Vector2(0.5f, 0.5f),
+                        100f,
+                        0U,
+                        SpriteMeshType.FullRect
+                    );
+                    return defaultTile;
+                } 
+                
+            }
             
             public static void Load()
             {
@@ -162,7 +167,7 @@ namespace RinWorld.Util.Data
             {
                 var folder = ModsFolder + mod + TilesFolder;
                 foreach (var (name, tile) in Files.ReadTiles(folder, TileSize))
-                    tiles.Add(name, tile);
+                    tiles.Add(name, new ImmutableTile(tile));
             }
 
             private static void LoadUnits()
@@ -268,7 +273,7 @@ namespace RinWorld.Util.Data
             {
                 var folder = ModsFolder + mod + UtilTilesFolder;
                 foreach (var (name, tile) in Files.ReadTiles(folder, CellSize))
-                    utilTiles.Add(name, tile);
+                    utilTiles.Add(name, new ImmutableTile(tile));
             }
 
             private static void LoadModsPriority()
@@ -290,6 +295,8 @@ namespace RinWorld.Util.Data
             {
                 foreach (var mod in _mods)
                     LoadBiomes(mod);
+                
+                Test.Test.BiomeCoverage();
             }
 
             private static void LoadBiomes(string mod)
@@ -300,8 +307,6 @@ namespace RinWorld.Util.Data
 
                 foreach (JObject biome in jArray)
                     LoadBiome(folder, biome);
-
-                Files.WriteContentsGameFolder("/biomesExcluded1.txt", BiomePreset.CheckBiomeCoverage());
             }
 
             private static void LoadBiome(string biomesFolder, JObject jBiome)
@@ -372,7 +377,7 @@ namespace RinWorld.Util.Data
                 var tile = Files.ReadTile(biomesFolder, CellSize, name);
 
                 var relief = new ReliefPreset(
-                    tile,
+                    new ImmutableTile(tile),
                     name,
                     jRelief["min_height"].Value<float>()
                 );

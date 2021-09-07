@@ -2,6 +2,9 @@
 {
     public class PlayerController : Controller
     {
+        public static readonly Controller CURRENT_PLAYER = new PlayerController();
+
+
         public PlayerController() : base(true)
         {
         }
