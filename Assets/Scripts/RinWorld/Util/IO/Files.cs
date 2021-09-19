@@ -9,9 +9,10 @@ namespace RinWorld.Util.IO
 {
     public static class Files
     {
+        private static readonly char[] separatorChars = {'/', '\\'};
         public static void WriteContentsGameFolder(string localPath, string contents)
         {
-            WriteContentsGlobal(Application.dataPath + localPath, contents);
+            WriteContentsGlobal(Path.Combine(Application.dataPath, localPath), contents);
         }
 
         private static void WriteContentsGlobal(string globalPath, string contents)
@@ -20,11 +21,11 @@ namespace RinWorld.Util.IO
         }
 
         /**
-         * Read contents of file Application.dataPath + path
+         * Read contents of file Path.Combine(Application.dataPath, path)
          */
         public static string ReadContentsGameFolder(string localPath)
         {
-            return ReadContentsGlobal(Application.dataPath + localPath);
+            return ReadContentsGlobal(Path.Combine(Application.dataPath, localPath));
         }
 
         public static string ReadContentsGlobal(string globalPath)
@@ -37,13 +38,13 @@ namespace RinWorld.Util.IO
 
         public static IEnumerable<(string, Tile)> ReadTiles(string path, int tileSize)
         {
-            foreach (var file in Directory.GetFiles(Application.dataPath + path, "*.png"))
+            foreach (var file in Directory.GetFiles(Path.Combine(Application.dataPath, path), "*.png"))
                 yield return (ExtractName(file), ReadTile("", tileSize, file, true));
         }
 
         private static string ExtractName(string file)
         {
-            var withoutPath = file.Substring(file.LastIndexOf('/') + 1);
+            var withoutPath = file.Substring(file.LastIndexOfAny(separatorChars) + 1);
             var name = withoutPath.Substring(0, withoutPath.LastIndexOf('.'));
             return name;
         }
@@ -66,7 +67,7 @@ namespace RinWorld.Util.IO
             }
             catch (ArgumentException e)
             {
-                throw new InvalidFileException(path + name, e);
+                throw new InvalidFileException(Path.Combine(path, name), e);
             }
 
             return tile;
@@ -80,16 +81,15 @@ namespace RinWorld.Util.IO
 
             byte[] bytes;
             if (isGlobalPath)
-                bytes = GetBytesGlobal(path + name);
+                bytes = GetBytesGlobal(Path.Combine(path, name));
             else
-                bytes = GetBytesGameFolder(path + name);
+                bytes = GetBytesGameFolder(Path.Combine(path, name));
             texture2D.LoadImage(bytes);
             return texture2D;
         }
-
         public static byte[] GetBytesGameFolder(string localPath)
         {
-            return GetBytesGlobal(Application.dataPath + localPath);
+            return GetBytesGlobal(Path.Combine(Application.dataPath, localPath));
         }
 
         private static byte[] GetBytesGlobal(string path)
@@ -102,7 +102,7 @@ namespace RinWorld.Util.IO
 
         public static bool FileGameFolderExists(string localPath)
         {
-            return FileGlobalExists(Application.dataPath + localPath);
+            return FileGlobalExists(Path.Combine(Application.dataPath, localPath));
         }
 
         public static bool FileGlobalExists(string globalPath)

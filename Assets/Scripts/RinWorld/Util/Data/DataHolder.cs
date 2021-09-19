@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using Newtonsoft.Json.Linq;
-using RinWorld.Buildings;
+using RinWorld.Util.Data.ModActions;
 using RinWorld.Util.Exception;
 using RinWorld.Util.IO;
 using RinWorld.Util.Unity;
@@ -23,18 +22,20 @@ namespace RinWorld.Util.Data
         private static readonly Dictionary<string, ImmutableTile> tiles = new Dictionary<string, ImmutableTile>();
         private static readonly Dictionary<string, ImmutableTile> utilTiles = new Dictionary<string, ImmutableTile>();
 
-        private static readonly Dictionary<string, KeyCode> keySet = new Dictionary<string, KeyCode>();
+        private static readonly Dictionary<string, KeyCode> keys = new Dictionary<string, KeyCode>();
 
         private static readonly Dictionary<string, float> conditions = new Dictionary<string, float>();
 
         private static readonly Dictionary<string, Unit> units = new Dictionary<string, Unit>();
-        private static readonly ImmutableTile DefaultTile = new ImmutableTile(ConstantLoader.DefaultTile);
+        private static readonly ImmutableTile DefaultTile = new ImmutableTile(Types.DefaultTile);
 
         public static string Language { get; private set; }
 
         public static Unit GetUnit(string name)
         {
-            return units[name];
+            if(units.ContainsKey(name))
+                return units[name];
+            throw new KeyNotFoundException($"Key {name} was not found in {nameof(units)}");
         }
 
         public static ImmutableTile GetTile(string name)
@@ -57,12 +58,15 @@ namespace RinWorld.Util.Data
 
         public static ImmutableTile GetUtilTile(string name)
         {
-            return utilTiles[name];
+            if (utilTiles.ContainsKey(name))
+                return utilTiles[name];
+            Debug.LogError($"UtilTile {name} was not found, using default tile instead.");
+            return DefaultTile;
         }
 
         public static KeyCode GetKeyCode(string action)
         {
-            return keySet[action];
+            return keys[action];
         }
 
         public static float GetCondition(string condition)
@@ -70,129 +74,35 @@ namespace RinWorld.Util.Data
             return conditions[condition];
         }
 
+        private static Loader loader;
         public static void Load()
         {
-            ConstantLoader.Load();
+            Loader.init();
+            loader.Load();
         }
 
         public static void SetLanguage(string language)
         {
-            Files.WriteContentsGameFolder(ConstantLoader.Language, $"{{\n\t\"language\": \"{language}\"\n}}");
-            ConstantLoader.LoadLanguage();
-            ConstantLoader.LoadTranslations();
+            Files.WriteContentsGameFolder(LanguageHolder.LanguageFile, $"{{\n\t\"language\": \"{language}\"\n}}");
+            LanguageHolder.LoadLanguage();
+            loader.Load<Translations>();
         }
 
         public static string Translate(string key)
         {
             return translation.ContainsKey(key) ? translation[key] : key;
         }
-
-        private static class ConstantLoader
+        
+        private static class LanguageHolder
         {
-            private const string ModsFolder = "/mods/";
-            private const string ModsPriority = ModsFolder + "priority.json";
-            private const string UtilFolder = "/util/";
-            private const string UtilTilesFolder = UtilFolder + "tiles/";
-            private const string TilesFolder = "/tiles/";
-            private const string Units = "/units.json";
-            private const string Conditions = "/conditions.json";
-            private const string Keys = UtilFolder + "keys.json";
-            public const string Language = "/language.json";
-            private const string LanguagesFolder = "/languages/";
-            private const string BiomesFolder = "/biomes/";
-            private const string ReliefsFolder = "/reliefs/";
-            private const string Biomes = "biomes.json";
-            private const string Reliefs = "reliefs.json";
-
-            public const int CellSize = 2048;
-            public const int TileSize = 128;
-
-            private static string[] _mods;
-
-            public static Tile DefaultTile
-            {
-                get
-                {
-                    Tile defaultTile = ScriptableObject.CreateInstance<Tile>();
-                    var texture2D = new Texture2D(TileSize, TileSize);
-                    for (var x = 0; x < TileSize; x++)
-                    for (var y = 0; y < TileSize; y++)
-                    {
-                        var color = x / 64 + y / 64;
-                        texture2D.SetPixel(x, y, color % 2 == 1 ? Color.black : Color.yellow);
-                    }
-
-                    texture2D.Apply();
-                    defaultTile.sprite = Sprite.Create(
-                        texture2D,
-                        new Rect(0, 0, TileSize, TileSize),
-                        new Vector2(0.5f, 0.5f),
-                        100f,
-                        0U,
-                        SpriteMeshType.FullRect
-                    );
-                    return defaultTile;
-                } 
-                
-            }
-            
-            public static void Load()
-            {
-                if (Game.GameState != GameState.LoadingConstants)
-                    throw new InvalidStateException($"The game is not in {nameof(GameState.LoadingConstants)} state, " +
-                                                    $"but asked to be {nameof(GameState.LoadingConstants)}");
-
-                LoadModsPriority();
-
-                LoadLanguage();
-                LoadTranslations();
-
-                LoadTiles();
-                LoadUnits();
-                
-                LoadKeystrokes();
-                LoadConditions();
-                LoadUtilTiles();
-                LoadBiomes();
-                LoadReliefs();
-            }
-
-            private static void LoadTiles()
-            {
-                foreach (var mod in _mods)
-                    LoadTiles(mod);
-            }
-
-            private static void LoadTiles(string mod)
-            {
-                var folder = ModsFolder + mod + TilesFolder;
-                foreach (var (name, tile) in Files.ReadTiles(folder, TileSize))
-                    tiles.Add(name, new ImmutableTile(tile));
-            }
-
-            private static void LoadUnits()
-            {
-                foreach (var mod in _mods)
-                    LoadUnits(mod);
-            }
-
-            private static void LoadUnits(string mod)
-            {
-                var json = Files.ReadContentsGameFolder(ModsFolder + mod + Units);
-                var jUnits = JArray.Parse(json);
-                var folder = ModsFolder + mod + TilesFolder;
-
-                foreach (JObject jUnit in jUnits)
-                    units.Add(jUnit["name"].Value<string>(), Unit.Of(jUnit));
-            }
-
+            public const string LanguageFile = "language.json";
             public static void LoadLanguage()
             {
-                var jsonLanguage = Files.ReadContentsGameFolder(Language);
+                var jsonLanguage = Files.ReadContentsGameFolder(LanguageFile);
                 if (jsonLanguage == null)
                 {
                     DataHolder.Language = CultureInfo.CurrentUICulture.Name;
-                    Files.WriteContentsGameFolder(Language, $"{{\n\t\"language\": \"{DataHolder.Language}\"\n}}");
+                    Files.WriteContentsGameFolder(LanguageFile, $"{{\n\t\"language\": \"{DataHolder.Language}\"\n}}");
                 }
                 else
                 {
@@ -204,186 +114,87 @@ namespace RinWorld.Util.Data
 
             private static void CheckLanguageSupport()
             {
-                if (!Files.FileGameFolderExists(ModsFolder + "core" + LanguagesFolder + DataHolder.Language + ".json"))
+                string path = Path.Combine(Loader.ModsFolder, "core", Loader.LanguagesFolder, DataHolder.Language + ".json");
+                if (!Files.FileGameFolderExists(path))
                 {
                     DataHolder.Language = "en-US";
-                    Files.WriteContentsGameFolder(Language, "{\n\t\"language\": \"en-US\"\n}");
+                    Files.WriteContentsGameFolder(LanguageFile, "{\n\t\"language\": \"en-US\"\n}");
                 }
             }
+        }
 
-            public static void LoadTranslations()
+        public class Loader
+        {            
+            public const string ModsFolder = "mods";
+            private const string ModsPriority = ModsFolder + "priority.json";
+            public const string LanguagesFolder = "languages";
+            public const string UtilFolder = "util";
+
+            public const int WorldCellSize = 2048;
+            public const int MapCellSize = 128;
+
+            private Mod[] _mods;
+            internal static void init() {}
+            static Loader()
             {
-                foreach (var mod in _mods)
-                    LoadTranslations(mod);
+                loader = new Loader();
             }
 
-            private static void LoadTranslations(string mod)
+            public void Load()
             {
-                var languageSet =
-                    Files.ReadContentsGameFolder(ModsFolder + mod + LanguagesFolder + DataHolder.Language + ".json");
-                var jLanguageSet = JObject.Parse(languageSet);
-                foreach (var jProperty in jLanguageSet)
-                    translation.Add(jProperty.Key, jProperty.Value.Value<string>());
+                if (Game.GameState != GameState.LoadingConstants)
+                    throw new InvalidStateException($"The game is not in {nameof(GameState.LoadingConstants)} state, " +
+                                                    $"but asked to be {nameof(GameState.LoadingConstants)}");
+
+                LanguageHolder.LoadLanguage();
+                LoadMods();
+                Test.Test.BiomeCoverage();
+            }
+            public void Load<Action>() where Action : ModAction=> 
+                Mod.ProcessAction<Action>(this, _mods);
+            
+            private void LoadMods()
+            {
+                LoadListOfModsFromDisk();
+                LoadActionsWithPriority();
             }
 
-            private static void LoadKeystrokes()
+            private void LoadListOfModsFromDisk()
             {
-                foreach (var mod in _mods)
-                    LoadKeystrokes(mod);
-            }
-
-            private static void LoadKeystrokes(string mod)
-            {
-                var path = ModsFolder + mod + Keys;
-                var json = Files.ReadContentsGameFolder(path);
-                var jObject = JObject.Parse(json);
-
-                foreach (var jProperty in jObject)
+                string stringPriorities = Files.ReadContentsGameFolder(ModsPriority);
+                if (string.IsNullOrEmpty(stringPriorities))
                 {
-                    var parsed = Enum.TryParse(jProperty.Value.Value<string>(), out KeyCode keyCode);
-                    if (!parsed)
-                        throw new System.Exception($"Could not load key {jProperty.Key} for {jProperty.Value}");
-                    keySet.Add(jProperty.Key, keyCode);
-                }
-            }
-
-            private static void LoadConditions()
-            {
-                foreach (var mod in _mods)
-                    LoadConditions(mod);
-            }
-
-            private static void LoadConditions(string mod)
-            {
-                var path = ModsFolder + mod + Conditions;
-                var json = Files.ReadContentsGameFolder(path);
-                var jObject = JObject.Parse(json);
-
-                foreach (var jCondition in jObject)
-                    conditions.Add(jCondition.Key, jCondition.Value.Value<float>());
-            }
-
-            private static void LoadUtilTiles()
-            {
-                foreach (var mod in _mods)
-                    LoadUtilTiles(mod);
-            }
-
-            private static void LoadUtilTiles(string mod)
-            {
-                var folder = ModsFolder + mod + UtilTilesFolder;
-                foreach (var (name, tile) in Files.ReadTiles(folder, CellSize))
-                    utilTiles.Add(name, new ImmutableTile(tile));
-            }
-
-            private static void LoadModsPriority()
-            {
-                var priority = Files.ReadContentsGameFolder(ModsPriority);
-                if (string.IsNullOrEmpty(priority))
-                {
-                    _mods = new[] {"core"};
+                    _mods = new[] { new Mod("core", 0) };
+                    Files.WriteContentsGameFolder(ModsPriority, "[\n\t\"core\"\n]");
                     return;
                 }
 
-                var jArray = JArray.Parse(priority);
-                _mods = new string[jArray.Count];
-                for (var i = 0; i < _mods.Length; i++)
-                    _mods[i] = jArray[i].Value<string>();
+                var jMods = JArray.Parse(stringPriorities);
+                _mods = new Mod[jMods.Count];
+                for (int i = 0; i < _mods.Length; i++)
+                    _mods[i] = new Mod(jMods[i].Value<string>(), i);
             }
+            private void LoadActionsWithPriority() => 
+                Mod.Process(this, _mods);
 
-            private static void LoadBiomes()
-            {
-                foreach (var mod in _mods)
-                    LoadBiomes(mod);
-                
-                Test.Test.BiomeCoverage();
-            }
-
-            private static void LoadBiomes(string mod)
-            {
-                var folder = ModsFolder + mod + BiomesFolder;
-                var json = Files.ReadContentsGameFolder(folder + Biomes);
-                var jArray = JArray.Parse(json);
-
-                foreach (JObject biome in jArray)
-                    LoadBiome(folder, biome);
-            }
-
-            private static void LoadBiome(string biomesFolder, JObject jBiome)
-            {
-                var name = jBiome["name"].Value<string>();
-                var tile = Files.ReadTile(biomesFolder, CellSize, name);
-
-                var points = LoadPoints(jBiome["points"] as JArray);
-
-                var biome = new BiomePreset(
-                    tile,
-                    name,
-                    jBiome["min_height"].Value<float>(),
-                    jBiome["min_moisture"].Value<float>(),
-                    jBiome["min_heat"].Value<float>(),
-                    jBiome["max_height"].Value<float>(),
-                    jBiome["max_moisture"].Value<float>(),
-                    jBiome["max_heat"].Value<float>(),
-                    points
-                );
-
-                biomes.Add(name, biome);
-            }
-
-            [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
-            private static PointPreset[] LoadPoints(JArray jPoints)
-            {
-                var points = new PointPreset[jPoints.Count];
-                for (var i = 0; i < points.Length; i++)
-                {
-                    var jPoint = jPoints[i] as JObject;
-                    Building building = null;
-                    if (jPoint.ContainsKey("building"))
-                        building = (Building) GetUnit(jPoint["building"].Value<string>());
-
-                    points[i] = new PointPreset(
-                        building,
-                        (Floor) GetUnit(jPoint["floor"].Value<string>()),
-                        jPoint["name"].Value<string>(),
-                        jPoint["min_height"].Value<float>(),
-                        jPoint["min_worth"].Value<float>(),
-                        jPoint["min_presence"].Value<float>()
-                    );
-                }
-
-                return points;
-            }
-
-            private static void LoadReliefs()
-            {
-                foreach (var mod in _mods)
-                    LoadReliefs(mod);
-            }
-
-            private static void LoadReliefs(string mod)
-            {
-                var folder = ModsFolder + mod + ReliefsFolder;
-                var json = Files.ReadContentsGameFolder(folder + Reliefs);
-                var jArray = JArray.Parse(json);
-
-                foreach (JObject biome in jArray)
-                    LoadRelief(folder, biome);
-            }
-
-            private static void LoadRelief(string biomesFolder, JObject jRelief)
-            {
-                var name = jRelief["name"].Value<string>();
-                var tile = Files.ReadTile(biomesFolder, CellSize, name);
-
-                var relief = new ReliefPreset(
-                    new ImmutableTile(tile),
-                    name,
-                    jRelief["min_height"].Value<float>()
-                );
-
-                reliefs.Add(name, relief);
-            }
+#region Adders
+            public void AddTranslation(string name, string value) => 
+                translation.Add(name, value);
+            public void AddTile(string name, ImmutableTile value) => 
+                tiles.Add(name, value);
+            public void AddUnit(string name, Unit value) => 
+                units.Add(name, value);
+            public void AddKey(string name, KeyCode value) => 
+                keys.Add(name, value);
+            public void AddCondition(string name, float value) => 
+                conditions.Add(name, value);
+            public void AddUtilTile(string name, ImmutableTile immutableTile) => 
+                utilTiles.Add(name, immutableTile);
+            public void AddBiome(string name, BiomePreset value) => 
+                biomes.Add(name, value);
+            public void AddRelief(string name, ReliefPreset value) => 
+                reliefs.Add(name, value);
+#endregion
         }
     }
 }

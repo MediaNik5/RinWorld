@@ -23,8 +23,7 @@ namespace RinWorld
             {
                 Stopwatch.Stop();
                 Debug.Log($"The game switched from {_gameState} to {value} for {Stopwatch.ElapsedMilliseconds} ms.");
-                Stopwatch.Reset();
-                Stopwatch.Start();
+                Stopwatch.Restart();
                 _gameState = value;
             }
         }

@@ -14,7 +14,7 @@ namespace RinWorld.World
         private readonly float _moistureSeed;
         private readonly float _heightSeed;
 
-        private Point[,] _points;
+        private MapCell[,] _points;
         private readonly BiomePreset _biome;
 
         public Map(int height, int width, BiomePreset biome, float heatSeed, float moistureSeed, float heightSeed)
@@ -32,6 +32,7 @@ namespace RinWorld.World
             GenerateMap();
         }
 
+        
         private void GenerateMap()
         {
             var random = new Random((int) (((_heatSeed * 31 + _moistureSeed) * 31 + _heightSeed) * 31));
@@ -43,10 +44,10 @@ namespace RinWorld.World
             var worthMap = Noise.Generate(_width, _height, worthWaves);
             var presenceMap = Noise.Generate(_width, _height, presenceWaves);
 
-            _points = new Point[_width, _height];
+            _points = new MapCell[_width, _height];
             for (var x = 0; x < _width; x++)
             for (var y = 0; y < _height; y++)
-                _points[x, y] = Point.Of(x, y, _biome, CorrectHeight(heightMap[x, y]), worthMap[x, y],
+                _points[x, y] = MapCell.Of(x, y, _biome, CorrectHeight(heightMap[x, y]), worthMap[x, y],
                     presenceMap[x, y]);
         }
 

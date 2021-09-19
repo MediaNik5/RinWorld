@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using RinWorld.Util;
 using RinWorld.Util.Data;
 using RinWorld.Util.Unity;
-using UnityEngine;
 using UnityEngine.Tilemaps;
 
 namespace RinWorld.World
@@ -20,11 +16,11 @@ namespace RinWorld.World
         private readonly float _maxMoisture;
         public readonly string name;
         public readonly ImmutableTile tile;
-        private readonly PointPreset[] _pointPresets;
+        private readonly MapCellPreset[] _mapCellPresets;
 
 
         internal BiomePreset(Tile tile, string name, float minHeight, float minMoisture, float minHeat, float maxHeight,
-            float maxMoisture, float maxHeat, PointPreset[] pointPresets)
+            float maxMoisture, float maxHeat, MapCellPreset[] mapCellPresets)
         {
             this.tile = new ImmutableTile(tile);
             this.name = name;
@@ -32,7 +28,7 @@ namespace RinWorld.World
             _minMoisture = minMoisture;
             _minHeat = minHeat;
 
-            _pointPresets = pointPresets;
+            _mapCellPresets = mapCellPresets;
             _maxHeat = maxHeat;
             _maxHeight = maxHeight;
             _maxMoisture = maxMoisture;
@@ -68,14 +64,14 @@ namespace RinWorld.World
             return biomeToReturn;
         }
 
-        public PointPreset PointFor(float height, float worth, float presence)
+        public MapCellPreset MapCellPresetFor(float height, float worth, float presence)
         {
-            PointPreset pointToReturn = null;
-            foreach (var point in _pointPresets)
-                if (point.MatchCondition(height, worth, presence))
-                    if (point.CompareTo(pointToReturn) > 0)
-                        pointToReturn = point;
-            return pointToReturn;
+            MapCellPreset mapCellToReturn = null;
+            foreach (var mapCell in _mapCellPresets)
+                if (mapCell.MatchCondition(height, worth, presence))
+                    if (mapCell.CompareTo(mapCellToReturn) > 0)
+                        mapCellToReturn = mapCell;
+            return mapCellToReturn;
         }
 
         public override string ToString()

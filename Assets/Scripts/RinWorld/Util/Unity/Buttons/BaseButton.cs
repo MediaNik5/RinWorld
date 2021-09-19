@@ -1,5 +1,4 @@
-﻿using System;
-using RinWorld.Util.Data;
+﻿using RinWorld.Util.Data;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -50,14 +49,7 @@ namespace RinWorld.Util.Unity.Buttons
 
         public static void SetTranslation(Component obj, string name)
         {
-            try
-            {
-                obj.transform.Find("Text").GetComponent<Text>().text = DataHolder.Translate(name);
-            }
-            catch (NullReferenceException ex)
-            {
-                Debug.Log("Null");
-            }
+            obj.transform.Find("Text").GetComponent<Text>().text = DataHolder.Translate(name);
         }
     }
 }

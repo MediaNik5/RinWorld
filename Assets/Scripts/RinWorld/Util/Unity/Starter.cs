@@ -15,14 +15,14 @@ namespace RinWorld.Util.Unity
             {
                 Debug.LogError(ex);
                 var canvas = FindObjectOfType<Canvas>();
-                var errorPane = canvas.transform.Find("ErrorPane").gameObject;
-                errorPane.SetActive(true);
+                var errorPane = canvas.transform.Find("ErrorPane");
+                errorPane.gameObject.SetActive(true);
 
-                var errorText = errorPane.transform.Find("ErrorText").GetComponent<Text>();
+                var errorText = errorPane.Find("Text").GetComponent<Text>();
                 errorText.text = "Here is the stacktrace for current exception. " +
                                  $"Full stacktrace can be found in {Application.persistentDataPath}/Player.log\n" + ex;
 
-                var button = errorPane.transform.Find("ExitButton").GetComponent<Button>();
+                var button = errorPane.Find("ExitButton").GetComponent<Button>();
                 button.onClick.AddListener(() => Application.Quit(1));
             }
         }

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
 using RinWorld.Control;
 using RinWorld.Util.Attribute;
 using RinWorld.Util.Exception;
 using Action = RinWorld.Control.Action;
+using Types = RinWorld.Util.Types;
 
 namespace RinWorld
 {
@@ -64,27 +64,20 @@ namespace RinWorld
 
         static Unit()
         {
-            var types =
-                (from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                    from type in assembly.GetTypes()
-                    where type.IsSubclassOf(typeof(Unit))
-                    select type).ToArray();
+            var types = Types.GetAllSubtypes<Unit>();
             creators = new Dictionary<string, Func<JObject, Unit>>(types.Length);
             foreach (var type in types)
             {
-                var method = type.GetMethod("Of", BindingFlags.Static | BindingFlags.NonPublic);
+                var method = Types.GetMethodOrNull(
+                    type,
+                    "Of",
+                    BindingFlags.Static | BindingFlags.NonPublic,
+                    typeof(Unit),
+                    typeof(JObject)
+                );
 
-                if (method != null &&
-                    method.ReturnType == typeof(Unit) && 
-                    method.GetParameters().Length == 1 &&
-                    method.GetParameters()[0].ParameterType == typeof(JObject))
-                {
-                    creators.Add(
-                        type.Name,
-                        Delegate.CreateDelegate(typeof(Func<JObject, Unit>), null, method) as Func<JObject, Unit>
-                    );
-                }
-
+                if (method != null)
+                    creators.Add(type.Name, Types.CreateStaticDelegate<Func<JObject, Unit>>(method));
             }
         }
 

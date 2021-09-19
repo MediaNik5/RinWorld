@@ -8,13 +8,17 @@ namespace RinWorld.Util.Unity.Grid
 {
     public class GridHiglither : MonoBehaviour
     {
+        private const int XForValue = 210;
+        private const int XForName = 10;
+        private const int XSize = 180;
+        private const int YSize = 20;
         private Camera _camera;
         private GameObject _cellInfoPane;
         private Button _play;
         private UnityEngine.Grid _grid;
         private ImmutableTile _hover;
         private Vector3Int _previousMousePosition;
-        private Vector3Int _previousSelection = new Vector3Int(int.MinValue, 0, 0);
+        private Vector3Int _previousSelection = new Vector3Int(int.MinValue, 0, 0); // First is dummy position
         private ImmutableTile _select;
         private Tilemap _util;
 
@@ -61,8 +65,8 @@ namespace RinWorld.Util.Unity.Grid
             var i = 0;
             foreach (var (name, value) in infos)
             {
-                CreateProperty(i, name, false);
-                CreateProperty(i, value, true);
+                UpdateProperty(i, name, false);
+                UpdateProperty(i, value, true);
                 i++;
             }
 
@@ -71,28 +75,44 @@ namespace RinWorld.Util.Unity.Grid
             _play.onClick.AddListener(() => Game.StartColony(x, y));
         }
 
-        private void CreateProperty(int i, string value, bool isValue)
+        private void UpdateProperty(int i, string value, bool isValue)
         {
-            var text = _cellInfoPane.transform.Find("Property " + (isValue ? "value" : "key") + $" {i}");
-            if (text == null)
-            {
-                var newText = new GameObject("Property " + (isValue ? "value" : "key") + $" {i}",
-                    typeof(RectTransform));
-                newText.transform.SetParent(_cellInfoPane.transform, false);
-                var rectTransform = newText.GetComponent<RectTransform>();
-                rectTransform.anchorMin = new Vector2(0, 1);
-                rectTransform.anchorMax = new Vector2(0, 1);
-                rectTransform.pivot = new Vector2(0, 0.5f);
-                rectTransform.anchoredPosition = new Vector2(isValue ? 210 : 10, -50 - 20 * i);
-                rectTransform.sizeDelta = new Vector2(180, 20);
-                var textComponent = newText.AddComponent<Text>();
-                textComponent.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-                textComponent.text = DataHolder.Translate(value);
-            }
-            else
-            {
+            Transform text = _cellInfoPane.transform.Find("Property " + (isValue ? "value" : "key") + $" {i}");
+            if (text != null)
                 text.GetComponent<Text>().text = DataHolder.Translate(value);
-            }
+            else
+                CreateNewProperty(i, value, isValue);
+        }
+
+        private void CreateNewProperty(int i, string value, bool isValue)
+        {
+            var newText = new GameObject(
+                "Property " + (isValue ? "value" : "key") + $" {i}",
+                typeof(RectTransform)
+            );
+            newText.transform.SetParent(_cellInfoPane.transform, false);
+            SetTextComponent(newText, value);
+            SetTransformComponent(newText, XFor(isValue), YFor(i));
+        }
+
+        private static void SetTextComponent(GameObject newText, string value)
+        {
+            var textComponent = newText.AddComponent<Text>();
+            textComponent.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            textComponent.text = DataHolder.Translate(value);
+        }
+        
+        private static int XFor(bool isValue) => isValue ? XForValue : XForName;
+        private static int YFor(int i) => -50 - 20 * i;
+
+        private static void SetTransformComponent(GameObject newText, int x, int y)
+        {
+            var rectTransform = newText.GetComponent<RectTransform>();
+            rectTransform.anchorMin = new Vector2(0, 1);
+            rectTransform.anchorMax = new Vector2(0, 1);
+            rectTransform.pivot = new Vector2(0, 0.5f);
+            rectTransform.anchoredPosition = new Vector2(x, y);
+            rectTransform.sizeDelta = new Vector2(XSize, YSize);
         }
 
         private Vector3Int GetMousePosition()

@@ -1,4 +1,5 @@
-﻿using RinWorld.Buildings;
+﻿using System;
+using RinWorld.Buildings;
 using RinWorld.Things;
 using RinWorld.Util.IO;
 using UnityEngine;
@@ -6,7 +7,7 @@ using UnityEngine.Tilemaps;
 
 namespace RinWorld.World
 {
-    public class Point : Unit, IRenderable
+    public class MapCell : Unit, IRenderable, IEquatable<MapCell>
     {
         private readonly int x;
         private readonly int y;
@@ -22,7 +23,7 @@ namespace RinWorld.World
 
         private readonly bool changed = false;
 
-        public Point(int x, int y, BiomePreset biome, float height, float worth, float presence)
+        public MapCell(int x, int y, BiomePreset biome, float height, float worth, float presence)
         {
             this.x = x;
             this.y = y;
@@ -32,17 +33,14 @@ namespace RinWorld.World
             _worth = Mathf.Clamp01(worth);
             _presence = Mathf.Clamp01(presence);
 
-            if (_worth >= 0.5f && _presence >= 0.5f)
-                Debug.Log("More");
-
-            var pointPreset = biome.PointFor(_height, _worth, _presence);
+            var pointPreset = biome.MapCellPresetFor(_height, _worth, _presence);
             _building = pointPreset.Building;
             _floor = pointPreset.Floor;
         }
 
-        public static Point Of(int x, int y, BiomePreset biome, float height, float worth, float presence)
+        public static MapCell Of(int x, int y, BiomePreset biome, float height, float worth, float presence)
         {
-            return new Point(x, y, biome, height, worth, presence);
+            return new MapCell(x, y, biome, height, worth, presence);
         }
 
         public void StartRender(Tilemap[] tilemaps)
@@ -59,6 +57,29 @@ namespace RinWorld.World
             _building?.Tile.ApplyFor(tilemaps[Building.Layer], _position);
             _floor?.Tile.ApplyFor(tilemaps[Floor.Layer], _position);
             _thing?.tile.ApplyFor(tilemaps[Thing.Layer], _position);
+        }
+
+        public bool Equals(MapCell other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return x == other.x && y == other.y;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((MapCell) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (x * 397) ^ y;
+            }
         }
     }
 }

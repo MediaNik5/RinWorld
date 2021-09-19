@@ -7,6 +7,7 @@
 
         public PlayerController() : base(true)
         {
+            
         }
 
         public override bool HasNextAction()

@@ -16,7 +16,7 @@ namespace RinWorld.World
 
         private static readonly Dictionary<(int, int), Colony> colonies = new Dictionary<(int, int), Colony>();
 
-        [DontSave] private Cell[,] _cells;
+        [DontSave] private WorldCell[,] _cells;
 
         // Reflection
         private World()
@@ -28,6 +28,7 @@ namespace RinWorld.World
             _width = width;
             _height = height;
             _seed = seed;
+            _cells = new WorldCell[_width, _height];
         }
 
         public void StartRender(Tilemap[] tilemaps)
@@ -59,32 +60,18 @@ namespace RinWorld.World
         private void GenerateWorld()
         {
             var random = new Random(_seed);
-            var heightWaves = GenerateWaves(random);
-            var moistureWaves = GenerateWaves(random);
-            var heatWaves = GenerateWaves(random);
+            var heightWaves = Noise.GenerateWaves(random, WaveNumber);
+            var moistureWaves = Noise.GenerateWaves(random, WaveNumber);
+            var heatWaves = Noise.GenerateWaves(random, WaveNumber);
 
             var heightMap = Noise.Generate(_width, _height, heightWaves);
             var moistureMap = Noise.Generate(_width, _height, moistureWaves);
             var heatMap = Noise.Generate(_width, _height, heatWaves);
 
-            _cells = new Cell[_width, _height];
             for (var x = 0; x < _width; x++)
-            for (var y = 0; y < _height; y++)
-                _cells[x, y] = Cell.Of(x, y, heightMap[x, y], moistureMap[x, y], heatMap[x, y],
-                    colonies.ContainsKey((x, y)) ? colonies[(x, y)] : null);
-        }
-
-        private Wave[] GenerateWaves(Random random)
-        {
-            var waves = new Wave[WaveNumber];
-            for (var i = 0; i < waves.Length; i++)
-                waves[i] = new Wave(
-                    random.Next(5000), //5000 is magic number
-                    (float) (random.NextDouble() * 0.08), //0.08 is magic number
-                    (float) random.NextDouble()
-                );
-
-            return waves;
+                for (var y = 0; y < _height; y++)
+                    _cells[x, y] = WorldCell.Of(x, y, heightMap[x, y], moistureMap[x, y], heatMap[x, y],
+                        colonies.ContainsKey((x, y)) ? colonies[(x, y)] : null);
         }
     }
 }

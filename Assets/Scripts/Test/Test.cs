@@ -28,11 +28,13 @@ namespace Test
             var noise = Noise.Generate(250, 250, waves);
 
             var texture = new Texture2D(250, 250, TextureFormat.ARGB32, false);
-            for (var i = 0; i < 250; i++)
-            for (var j = 0; j < 250; j++)
+            for (int i = 0; i < 250; i++)
             {
-                var color = Mathf.Clamp(noise[i, j], 0, 1);
-                texture.SetPixel(i, j, new Color(color, color, color, 1));
+                for (int j = 0; j < 250; j++)
+                {
+                    float color = Mathf.Clamp(noise[i, j], 0, 1);
+                    texture.SetPixel(i, j, new Color(color, color, color, 1));
+                }
             }
 
             texture.Apply();
@@ -81,75 +83,75 @@ namespace Test
 
         private class Range
         {
-            private float from1;
-            private float to1;
+            private float _from1;
+            private float _to1;
 
-            private float from2;
-            private float to2;
+            private float _from2;
+            private float _to2;
 
-            private float from3;
-            private float to3;
+            private float _from3;
+            private float _to3;
 
-            private readonly float diff;
+            private readonly float _diff;
 
             public Range(float initial1, float initial2, float initial3, float step, float epsilon)
             {
-                from1 = to1 = initial1;
-                from2 = to2 = initial2;
-                from3 = to3 = initial3;
-                diff = step + epsilon;
+                _from1 = _to1 = initial1;
+                _from2 = _to2 = initial2;
+                _from3 = _to3 = initial3;
+                _diff = step + epsilon;
             }
 
             public bool CheckAndAdd(float value1, float value2, float value3)
             {
-                if (from1 <= value1 && value1 <= to1 &&
-                    from2 <= value2 && value2 <= to2 &&
-                    from3 <= value3 && value3 <= to3)
+                if (_from1 <= value1 && value1 <= _to1 &&
+                    _from2 <= value2 && value2 <= _to2 &&
+                    _from3 <= value3 && value3 <= _to3)
                     return true;
-                if (from2 <= value2 && value2 <= to2 &&
-                    from3 <= value3 && value3 <= to3)
+                if (_from2 <= value2 && value2 <= _to2 &&
+                    _from3 <= value3 && value3 <= _to3)
                 {
-                    if (0 < from1 - value1 && from1 - value1 < diff)
+                    if (0 < _from1 - value1 && _from1 - value1 < _diff)
                     {
-                        from1 = value1;
+                        _from1 = value1;
                         return true;
                     }
 
-                    if (0 < value1 - to1 && value1 - to1 < diff)
+                    if (0 < value1 - _to1 && value1 - _to1 < _diff)
                     {
-                        to1 = value1;
+                        _to1 = value1;
                         return true;
                     }
                 }
 
-                if (from1 <= value1 && value1 <= to1 &&
-                    from3 <= value3 && value3 <= to3)
+                if (_from1 <= value1 && value1 <= _to1 &&
+                    _from3 <= value3 && value3 <= _to3)
                 {
-                    if (0 < from2 - value2 && from2 - value2 < diff)
+                    if (0 < _from2 - value2 && _from2 - value2 < _diff)
                     {
-                        from2 = value2;
+                        _from2 = value2;
                         return true;
                     }
 
-                    if (0 < value2 - to2 && value2 - to2 < diff)
+                    if (0 < value2 - _to2 && value2 - _to2 < _diff)
                     {
-                        to2 = value2;
+                        _to2 = value2;
                         return true;
                     }
                 }
 
-                if (from1 <= value1 && value1 <= to1 &&
-                    from2 <= value2 && value2 <= to2)
+                if (_from1 <= value1 && value1 <= _to1 &&
+                    _from2 <= value2 && value2 <= _to2)
                 {
-                    if (0 < from3 - value3 && from3 - value3 < diff)
+                    if (0 < _from3 - value3 && _from3 - value3 < _diff)
                     {
-                        from3 = value3;
+                        _from3 = value3;
                         return true;
                     }
 
-                    if (0 < value3 - to3 && value3 - to3 < diff)
+                    if (0 < value3 - _to3 && value3 - _to3 < _diff)
                     {
-                        to3 = value3;
+                        _to3 = value3;
                         return true;
                     }
                 }
@@ -159,7 +161,7 @@ namespace Test
 
             public override string ToString()
             {
-                return $"({from1}-{to1}, {from2}-{to2}, {from3}-{to3})";
+                return $"({_from1}-{_to1}, {_from2}-{_to2}, {_from3}-{_to3})";
             }
         }
     }

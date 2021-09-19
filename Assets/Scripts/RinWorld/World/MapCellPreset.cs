@@ -3,7 +3,7 @@ using RinWorld.Buildings;
 
 namespace RinWorld.World
 {
-    public class PointPreset : IComparable<PointPreset>
+    public class MapCellPreset : IComparable<MapCellPreset>
     {
         private readonly float _minHeight;
         private readonly float _minWorth;
@@ -13,7 +13,7 @@ namespace RinWorld.World
         public readonly Building Building;
         public readonly Floor Floor;
 
-        internal PointPreset(Building building, Floor floor, string name, float minHeight, float minWorth,
+        internal MapCellPreset(Building building, Floor floor, string name, float minHeight, float minWorth,
             float minPresence)
         {
             Building = building;
@@ -24,16 +24,14 @@ namespace RinWorld.World
             _minHeight = minHeight;
         }
 
-        public int CompareTo(PointPreset other)
+        public int CompareTo(MapCellPreset other)
         {
             if (this == other) return 0;
             if (other == null) return 1;
 
             return _minHeight - other._minHeight +
                 (_minWorth - other._minWorth) +
-                (_minPresence - other._minPresence) > 0
-                    ? 1
-                    : -1;
+                (_minPresence - other._minPresence) > 0 ? 1 : -1;
         }
 
         public bool MatchCondition(float height, float worth, float presence)
