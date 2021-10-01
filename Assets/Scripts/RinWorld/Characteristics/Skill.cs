@@ -5,9 +5,9 @@ namespace RinWorld.Characteristics
     public class Skill
     {
         
-        private string id;
+        private readonly SkillPreset id;
         private int level;
-        public Skill(string id, int level)
+        public Skill(SkillPreset id, int level)
         {
             this.id = id;
             this.level = level;
@@ -15,7 +15,7 @@ namespace RinWorld.Characteristics
 
 
         public override string ToString(){
-            return DataHolder.Translate(id) + $": {level}\n\n" + DataHolder.Translate(id + " description");
+            return DataHolder.Translate(id.ToString()) + $": {level}\n\n" + DataHolder.Translate(id + " description");
         }
     }
 }

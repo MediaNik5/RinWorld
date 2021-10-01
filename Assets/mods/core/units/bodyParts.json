@@ -1,0 +1,75 @@
+{
+  "priority": 2,
+  "units": [
+    {
+      "name": "Head",
+      "jointedTo": "Neck",
+      "type": "BodyPartPreset",
+      "maxDurability": 20,
+      "normalNumber": 1,
+      "maxAvailableNumber": 1,
+      "tile": "Head",
+      "influences": {
+        "All": 1
+      },
+      "eligibleTo": {
+        "All": true
+      }
+    },
+    {
+      "name": "Neck",
+      "jointedTo": "Neck",
+      "type": "BodyPartPreset",
+      "maxDurability": 20,
+      "normalNumber": 1,
+      "maxAvailableNumber": 1,
+      "tile": "Head",
+      "influences": {
+        "Breathing": 1
+      },
+      "eligibleTo": {
+        "All": true
+      }
+    },
+    {
+      "name": "Body",
+      "type": "BodyPartPreset",      
+      "jointedTo": "Body",
+      "maxDurability": 60,
+      "normalNumber": 1,
+      "maxAvailableNumber": 1,
+      "influences": {
+        "All": 0.3
+      },
+      "eligibleTo": {
+        "All": true
+      }
+    },
+    {
+      "name": "Hand",
+      "type": "LimbPreset",
+      "maxDurability": 40,
+      "normalNumber": 2,
+      "maxAvailableNumber": 2,
+      "influences": {
+        "All": 1
+      },
+      "eligibleTo": {
+        "Human": true
+      }
+    },
+    {
+      "name": "Leg",
+      "type": "LimbPreset",
+      "maxDurability": 40,
+      "normalNumber": 2,
+      "maxAvailableNumber": 2,
+      "influences": {
+        "All": 1
+      },
+      "eligibleTo": {
+        "All": true
+      }
+    }
+  ] 
+}
