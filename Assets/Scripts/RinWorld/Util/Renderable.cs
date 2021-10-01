@@ -1,6 +1,6 @@
 ﻿using UnityEngine.Tilemaps;
 
-namespace RinWorld.Util.IO
+namespace RinWorld.Util
 {
     public interface IRenderable
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RinWorld.World.Generator
+namespace RinWorld.Worlds.Generator
 {
     [Serializable]
     public class Wave

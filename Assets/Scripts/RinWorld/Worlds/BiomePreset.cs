@@ -1,11 +1,12 @@
 ﻿using System;
 using RinWorld.Util.Data;
 using RinWorld.Util.Unity;
+using RinWorld.Worlds.Maps;
 using UnityEngine.Tilemaps;
 
-namespace RinWorld.World
+namespace RinWorld.Worlds
 {
-    public class BiomePreset : IComparable<BiomePreset>
+    public class BiomePreset : UnitPreset, IComparable<BiomePreset>
     {
 
         private readonly float _minHeat;
@@ -19,8 +20,17 @@ namespace RinWorld.World
         private readonly MapCellPreset[] _mapCellPresets;
 
 
-        internal BiomePreset(Tile tile, string name, float minHeight, float minMoisture, float minHeat, float maxHeight,
-            float maxMoisture, float maxHeat, MapCellPreset[] mapCellPresets)
+        internal BiomePreset(
+            Tile tile,
+            string name,
+            float minHeight,
+            float minMoisture,
+            float minHeat,
+            float maxHeight,
+            float maxMoisture,
+            float maxHeat,
+            MapCellPreset[] mapCellPresets
+        ) : base(name)
         {
             this.tile = new ImmutableTile(tile);
             this.name = name;

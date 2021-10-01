@@ -1,11 +1,11 @@
 ﻿using System;
-using RinWorld.Util.IO;
-using RinWorld.World.Generator;
+using RinWorld.Util;
+using RinWorld.Worlds.Generator;
 using UnityEngine.Tilemaps;
 
-namespace RinWorld.World
+namespace RinWorld.Worlds.Maps
 {
-    public class Map : Unit, IRenderable
+    public class Map : IRenderable
     {
         private readonly int _height;
         private readonly int _width;
@@ -18,6 +18,7 @@ namespace RinWorld.World
         private readonly BiomePreset _biome;
 
         public Map(int height, int width, BiomePreset biome, float heatSeed, float moistureSeed, float heightSeed)
+        // :base($"Map_{heatSeed}_{moistureSeed}_{heightSeed}")
         {
             _height = height;
             _width = width;
@@ -26,14 +27,8 @@ namespace RinWorld.World
             _moistureSeed = moistureSeed;
             _heightSeed = heightSeed;
         }
-
-        public override void Initialize()
-        {
-            GenerateMap();
-        }
-
         
-        private void GenerateMap()
+        public void GenerateMap()
         {
             var random = new Random((int) (((_heatSeed * 31 + _moistureSeed) * 31 + _heightSeed) * 31));
             var heightWaves = GenerateWaves(random);
@@ -46,9 +41,9 @@ namespace RinWorld.World
 
             _points = new MapCell[_width, _height];
             for (var x = 0; x < _width; x++)
-            for (var y = 0; y < _height; y++)
-                _points[x, y] = MapCell.Of(x, y, _biome, CorrectHeight(heightMap[x, y]), worthMap[x, y],
-                    presenceMap[x, y]);
+                for (var y = 0; y < _height; y++)
+                    _points[x, y] = MapCell.Of(x, y, _biome, CorrectHeight(heightMap[x, y]), worthMap[x, y],
+                        presenceMap[x, y]);
         }
 
         private float CorrectHeight(float height)

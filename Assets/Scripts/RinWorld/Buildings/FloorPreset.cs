@@ -4,20 +4,20 @@ using RinWorld.Util.Unity;
 
 namespace RinWorld.Buildings
 {
-    public class Floor : Building
+    public class FloorPreset : BuildingPreset
     {
         public new const int Layer = 1;
 
-        public Floor(string name, ImmutableTile tile, bool canGoThrough, float goThroughRate) : base(name, tile, canGoThrough,
-            goThroughRate)
+        protected FloorPreset(string name, ImmutableTile tile, bool canGoThrough, float goThroughRate) 
+        : base(name, tile, canGoThrough, goThroughRate)
         {
         }
 
-        private new static Unit Of(JObject jObject)
+        private new static UnitPreset Of(JObject jObject)
         {
-            return new Floor(
+            return new FloorPreset(
                 jObject["name"].Value<string>(),
-                DataHolder.GetTile(jObject["tile"].Value<string>()),
+                ImmutableTile.Of(jObject["tile"]),
                 true,
                 jObject["goThroughRate"].Value<float>()
             );

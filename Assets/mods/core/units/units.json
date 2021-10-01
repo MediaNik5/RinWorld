@@ -1,0 +1,23 @@
+{
+	"priority": 0,
+	"units":[
+		{
+			"name": "Water",
+			"type": "FloorPreset",
+			"tile": "Water",
+			"goThroughRate": "0.1"
+		},
+		{
+			"name": "Ice",
+			"type": "FloorPreset",
+			"tile": "Ice",
+			"goThroughRate": "0.4"
+		},
+		{
+			"name": "Sands",
+			"type": "FloorPreset",
+			"tile": "Sands",
+			"goThroughRate": "0.4"
+		}
+	]		
+}

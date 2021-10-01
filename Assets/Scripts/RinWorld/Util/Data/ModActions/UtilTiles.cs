@@ -8,11 +8,10 @@ namespace RinWorld.Util.Data.ModActions
     {
 
         private static readonly string UtilTilesFolder = Path.Combine(DataHolder.Loader.UtilFolder, "tiles");
-        public string Name => GetType().Name;
-        public int Priority => 5;
-        public void Process(DataHolder.Loader loader, Mod mod)
+        public override int Priority => 5;
+        public override void Process(DataHolder.Loader loader, Mod mod, string modPath)
         {
-            var folder = Path.Combine(DataHolder.Loader.ModsFolder, mod.Name, UtilTilesFolder);
+            var folder = Path.Combine(modPath, UtilTilesFolder);
             foreach (var (name, tile) in Files.ReadTiles(folder, DataHolder.Loader.WorldCellSize))
                 loader.AddUtilTile(name, new ImmutableTile(tile));
         }

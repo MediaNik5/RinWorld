@@ -1,20 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json.Linq;
+using RinWorld.Characteristics;
+using RinWorld.Entities.Body;
 using RinWorld.Util.Data.ModActions;
 using RinWorld.Util.Exception;
 using RinWorld.Util.IO;
 using RinWorld.Util.Unity;
-using RinWorld.World;
+using RinWorld.Worlds;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace RinWorld.Util.Data
 {
     public static class DataHolder
     {
-        private static readonly Dictionary<string, string> translation = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> translations = new Dictionary<string, string>();
 
         private static readonly Dictionary<string, BiomePreset> biomes = new Dictionary<string, BiomePreset>();
         private static readonly Dictionary<string, ReliefPreset> reliefs = new Dictionary<string, ReliefPreset>();
@@ -26,12 +28,20 @@ namespace RinWorld.Util.Data
 
         private static readonly Dictionary<string, float> conditions = new Dictionary<string, float>();
 
-        private static readonly Dictionary<string, Unit> units = new Dictionary<string, Unit>();
-        private static readonly ImmutableTile DefaultTile = new ImmutableTile(Types.DefaultTile);
+        private static readonly Dictionary<string, UnitPreset> units = new Dictionary<string, UnitPreset>();
+        private static readonly ImmutableTile DefaultTile = new ImmutableTile(Utils.DefaultTile);
 
         public static string Language { get; private set; }
+        
+        public static List<T> GetUnits<T>() where T : UnitPreset
+        {
+            if (typeof(T) == typeof(UnitPreset))
+                return (List<T>)(object)new List<UnitPreset>(units.Values);
 
-        public static Unit GetUnit(string name)
+            return units.Values.Where(unit => unit is T).Cast<T>().ToList();
+        }
+        
+        public static UnitPreset GetUnit(string name)
         {
             if(units.ContainsKey(name))
                 return units[name];
@@ -77,7 +87,7 @@ namespace RinWorld.Util.Data
         private static Loader loader;
         public static void Load()
         {
-            Loader.init();
+            Loader._init();
             loader.Load();
         }
 
@@ -90,7 +100,7 @@ namespace RinWorld.Util.Data
 
         public static string Translate(string key)
         {
-            return translation.ContainsKey(key) ? translation[key] : key;
+            return translations.ContainsKey(key) ? translations[key] : key;
         }
         
         private static class LanguageHolder
@@ -101,12 +111,12 @@ namespace RinWorld.Util.Data
                 var jsonLanguage = Files.ReadContentsGameFolder(LanguageFile);
                 if (jsonLanguage == null)
                 {
-                    DataHolder.Language = CultureInfo.CurrentUICulture.Name;
-                    Files.WriteContentsGameFolder(LanguageFile, $"{{\n\t\"language\": \"{DataHolder.Language}\"\n}}");
+                    Language = CultureInfo.CurrentUICulture.Name;
+                    Files.WriteContentsGameFolder(LanguageFile, $"{{\n\t\"language\": \"{Language}\"\n}}");
                 }
                 else
                 {
-                    DataHolder.Language = JObject.Parse(jsonLanguage)["language"].Value<string>();
+                    Language = JObject.Parse(jsonLanguage)["language"].Value<string>();
                 }
 
                 CheckLanguageSupport();
@@ -114,10 +124,10 @@ namespace RinWorld.Util.Data
 
             private static void CheckLanguageSupport()
             {
-                string path = Path.Combine(Loader.ModsFolder, "core", Loader.LanguagesFolder, DataHolder.Language + ".json");
+                string path = Path.Combine(Loader.ModsFolder, "core", Loader.LanguagesFolder, Language + ".json");
                 if (!Files.FileGameFolderExists(path))
                 {
-                    DataHolder.Language = "en-US";
+                    Language = "en-US";
                     Files.WriteContentsGameFolder(LanguageFile, "{\n\t\"language\": \"en-US\"\n}");
                 }
             }
@@ -134,11 +144,12 @@ namespace RinWorld.Util.Data
             public const int MapCellSize = 128;
 
             private Mod[] _mods;
-            internal static void init() {}
+            internal static void _init() {}
             static Loader()
             {
                 loader = new Loader();
             }
+            protected Loader() {}
 
             public void Load()
             {
@@ -148,10 +159,11 @@ namespace RinWorld.Util.Data
 
                 LanguageHolder.LoadLanguage();
                 LoadMods();
+                
                 Test.Test.BiomeCoverage();
             }
-            public void Load<Action>() where Action : ModAction=> 
-                Mod.ProcessAction<Action>(this, _mods);
+            public void Load<TAction>() where TAction : ModAction=> 
+                Mods.ProcessAction<TAction>(this, _mods);
             
             private void LoadMods()
             {
@@ -175,14 +187,17 @@ namespace RinWorld.Util.Data
                     _mods[i] = new Mod(jMods[i].Value<string>(), i);
             }
             private void LoadActionsWithPriority() => 
-                Mod.Process(this, _mods);
+                Mods.Process(this, _mods);
 
 #region Adders
+
+            public void ResetTranslation() => 
+                translations.Clear();
             public void AddTranslation(string name, string value) => 
-                translation.Add(name, value);
+                translations.Add(name, value);
             public void AddTile(string name, ImmutableTile value) => 
                 tiles.Add(name, value);
-            public void AddUnit(string name, Unit value) => 
+            public void AddUnit(string name, UnitPreset value) => 
                 units.Add(name, value);
             public void AddKey(string name, KeyCode value) => 
                 keys.Add(name, value);
@@ -195,6 +210,7 @@ namespace RinWorld.Util.Data
             public void AddRelief(string name, ReliefPreset value) => 
                 reliefs.Add(name, value);
 #endregion
+
         }
     }
 }

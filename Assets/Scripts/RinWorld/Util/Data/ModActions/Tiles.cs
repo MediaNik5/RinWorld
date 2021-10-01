@@ -8,14 +8,13 @@ namespace RinWorld.Util.Data.ModActions
     {
 
         private const string TilesFolder = "tiles";
-        public string Name => GetType().Name;
-        public int Priority => 1;
+        public override int Priority => 1;
 
         
-        public void Process(DataHolder.Loader loader, Mod mod)
+        public override void Process(DataHolder.Loader loader, Mod mod, string modPath)
         {
-            var folder = Path.Combine(DataHolder.Loader.ModsFolder, mod.Name, TilesFolder);
-            foreach (var (name, tile) in Files.ReadTiles(folder, DataHolder.Loader.MapCellSize))
+            var folder = Path.Combine(modPath, TilesFolder);
+            foreach (var (name, tile) in Files.ReadTiles(folder, 2))
                 loader.AddTile(name, new ImmutableTile(tile));
         }
     }

@@ -2,7 +2,7 @@
 using RinWorld.Util.Data;
 using RinWorld.Util.Unity;
 
-namespace RinWorld.World
+namespace RinWorld.Worlds
 {
     public class ReliefPreset : IComparable<ReliefPreset>
     {

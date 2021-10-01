@@ -1,9 +1,10 @@
-﻿using RinWorld.Util.IO;
+﻿using RinWorld.Util;
+using RinWorld.Worlds.Maps;
 using UnityEngine.Tilemaps;
 
-namespace RinWorld.World
+namespace RinWorld.Worlds
 {
-    public class Colony : Unit, IRenderable
+    public class Colony : IRenderable
     {
         public readonly int x;
         public readonly int y;
@@ -15,6 +16,7 @@ namespace RinWorld.World
         private readonly Map _map;
 
         public Colony(int x, int y, BiomePreset biome, float heat, float moisture, float height)
+        // :base($"Colony ({x}, {y})")
         {
             this.x = x;
             this.y = y;
@@ -23,11 +25,7 @@ namespace RinWorld.World
             _height = height;
 
             _map = new Map(150, 150, biome, heat, moisture, height);
-        }
-
-        public override void Initialize()
-        {
-            _map.Initialize();
+            _map.GenerateMap();
         }
 
         public void StartRender(Tilemap[] tilemaps)

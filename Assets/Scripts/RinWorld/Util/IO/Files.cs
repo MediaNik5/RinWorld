@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using RinWorld.Util.Exception;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -58,7 +59,7 @@ namespace RinWorld.Util.IO
             {
                 tile.sprite = Sprite.Create(
                     texture2D,
-                    new Rect(0, 0, tileSize, tileSize),
+                    new Rect(0, 0, texture2D.width, texture2D.height),
                     new Vector2(0.5f, 0.5f),
                     100f,
                     0U,
@@ -75,7 +76,7 @@ namespace RinWorld.Util.IO
 
         public static Texture2D ReadTexture2D(string path, string name, int tileSize, bool isGlobalPath = false)
         {
-            var texture2D = new Texture2D(tileSize, tileSize);
+            var texture2D = new Texture2D(tileSize, tileSize, TextureFormat.ARGB32, false);
             if (!name.EndsWith(".png"))
                 name += ".png";
 
@@ -108,6 +109,18 @@ namespace RinWorld.Util.IO
         public static bool FileGlobalExists(string globalPath)
         {
             return File.Exists(globalPath);
+        }
+        /// <summary>
+        /// Gets contents from all files in <c>folder</c> matching <c>format</c>
+        /// </summary>
+        /// <returns>Contents of all files</returns>
+        public static string[] GetFilesGameFolder(string folder, string format)
+        {
+            return 
+                Directory.GetFiles(
+                    Path.Combine(Application.dataPath, folder), 
+                    format
+                ).Select(File.ReadAllText).ToArray();
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using RinWorld.Util.Data;
 using RinWorld.Util.Exception;
+using RinWorld.Worlds;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 using Debug = UnityEngine.Debug;
@@ -28,20 +29,16 @@ namespace RinWorld
             }
         }
 
+        public static World World { get; private set; }
+
+        public static Tilemap GetUtilTilemap() =>
+            _tilemaps[_tilemaps.Length - 1];
+
+        public static Tilemap GetTilemap(int index) =>
+            _tilemaps[index];
+        
         public static int TilemapsLength =>
             _tilemaps.Length;
-
-        public static World.World World { get; private set; }
-
-        public static Tilemap GetUtilTilemap()
-        {
-            return _tilemaps[_tilemaps.Length - 1];
-        }
-
-        public static Tilemap GetTilemap(int index)
-        {
-            return _tilemaps[index];
-        }
 
         public static void LaunchGame()
         {
@@ -83,8 +80,8 @@ namespace RinWorld
         {
             InitializeTilemaps();
 
-            World = new World.World(250, 250, seed);
-            World.Initialize();
+            World = new World(250, 250, seed);
+            World.GenerateWorld();
             World.StartRender(_tilemaps);
             GameState = GameState.Playing;
         }

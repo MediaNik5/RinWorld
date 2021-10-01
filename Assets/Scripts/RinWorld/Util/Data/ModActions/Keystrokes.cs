@@ -9,12 +9,11 @@ namespace RinWorld.Util.Data.ModActions
     public class Keystrokes : ModAction
     {
         private static readonly string KeysFile = Path.Combine(DataHolder.Loader.UtilFolder,  "keys.json");
-        public string Name => GetType().Name;
-        public int Priority => 3;
+        public override int Priority => 3;
 
-        public void Process(DataHolder.Loader loader, Mod mod)
+        public override void Process(DataHolder.Loader loader, Mod mod, string modPath)
         {
-            string path = Path.Combine(DataHolder.Loader.ModsFolder, mod.Name, KeysFile);
+            string path = Path.Combine(modPath, KeysFile);
             string json = Files.ReadContentsGameFolder(path);
             var jObject = JObject.Parse(json);
 

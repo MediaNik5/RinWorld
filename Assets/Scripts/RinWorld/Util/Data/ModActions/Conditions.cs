@@ -8,11 +8,10 @@ namespace RinWorld.Util.Data.ModActions
     {
 
         private const string ConditionsFile = "conditions.json";
-        public string Name => GetType().Name;
-        public int Priority => 4;
-        public void Process(DataHolder.Loader loader, Mod mod)
+        public override int Priority => 4;
+        public override void Process(DataHolder.Loader loader, Mod mod, string modPath)
         {
-            string path = Path.Combine(DataHolder.Loader.ModsFolder, mod.Name, ConditionsFile);
+            string path = Path.Combine(modPath, ConditionsFile);
             string json = Files.ReadContentsGameFolder(path);
             var jConditions = JObject.Parse(json);
 

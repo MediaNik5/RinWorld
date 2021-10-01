@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using RinWorld.Util;
 using RinWorld.Util.Attribute;
-using RinWorld.Util.IO;
-using RinWorld.World.Generator;
+using RinWorld.Worlds.Generator;
 using UnityEngine.Tilemaps;
 
-namespace RinWorld.World
+namespace RinWorld.Worlds
 {
-    public class World : Unit, IRenderable
+    public class World : IRenderable
     {
         [DontSave] public const int WaveNumber = 2;
         private readonly int _height;
@@ -18,12 +18,8 @@ namespace RinWorld.World
 
         [DontSave] private WorldCell[,] _cells;
 
-        // Reflection
-        private World()
-        {
-        }
-
         public World(int width, int height, int seed)
+            // : base($"World_seed_{seed}")
         {
             _width = width;
             _height = height;
@@ -51,13 +47,7 @@ namespace RinWorld.World
             return _cells[x, y].GenerateColony();
         }
 
-
-        public override void Initialize()
-        {
-            GenerateWorld();
-        }
-
-        private void GenerateWorld()
+        public void GenerateWorld()
         {
             var random = new Random(_seed);
             var heightWaves = Noise.GenerateWaves(random, WaveNumber);

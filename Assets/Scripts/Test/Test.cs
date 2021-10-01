@@ -2,8 +2,8 @@
 using System.IO;
 using System.Text;
 using RinWorld.Util.IO;
-using RinWorld.World;
-using RinWorld.World.Generator;
+using RinWorld.Worlds;
+using RinWorld.Worlds.Generator;
 using UnityEngine;
 
 namespace Test
@@ -16,17 +16,15 @@ namespace Test
 
             waves[0] = new Wave(12.3f, 0.01f, 0.9f);
             waves[1] = new Wave(123.4f, 0.01f, 0.1f);
-            NoiseSave(waves, "low_frequency");
+            SaveNoise(Noise.Generate(250, 250, waves), "low_frequency");
 
             waves[0] = new Wave(12.3f, 0.9f, 0.9f);
             waves[1] = new Wave(123.4f, 0.9f, 0.1f);
-            NoiseSave(waves, "high_frequency");
+            SaveNoise(Noise.Generate(250, 250, waves), "high_frequency");
         }
 
-        private static void NoiseSave(Wave[] waves, string name)
+        private static void SaveNoise(float[,] noise, string name)
         {
-            var noise = Noise.Generate(250, 250, waves);
-
             var texture = new Texture2D(250, 250, TextureFormat.ARGB32, false);
             for (int i = 0; i < 250; i++)
             {

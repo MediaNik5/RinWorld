@@ -45,14 +45,14 @@ namespace RinWorld.Util.Unity.Grid
             {
                 if (_previousMousePosition != _previousSelection)
                     _util.SetTile(_previousMousePosition, null);
-                _hover.ApplyFor(_util, mousePosition);
+                _util.SetTile(mousePosition, _hover);
                 _previousMousePosition = mousePosition;
             }
 
             if (mousePosition != _previousSelection && Input.GetMouseButtonDown(0))
             {
                 _util.SetTile(_previousSelection, null);
-                _select.ApplyFor(_util, mousePosition);
+                _util.SetTile(mousePosition, _select);
                 _previousSelection = mousePosition;
                 ShowCellInfo(mousePosition.x, mousePosition.y);
             }

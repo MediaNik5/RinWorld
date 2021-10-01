@@ -4,7 +4,8 @@ using Newtonsoft.Json.Linq;
 using RinWorld.Buildings;
 using RinWorld.Util.Exception;
 using RinWorld.Util.IO;
-using RinWorld.World;
+using RinWorld.Worlds;
+using RinWorld.Worlds.Maps;
 
 namespace RinWorld.Util.Data.ModActions
 {
@@ -13,11 +14,10 @@ namespace RinWorld.Util.Data.ModActions
 
         private const string BiomesFolder = "biomes";
         private const string BiomesFile = "biomes.json";
-        public string Name => GetType().Name;
-        public int Priority => 6;
-        public void Process(DataHolder.Loader loader, Mod mod)
+        public override int Priority => 6;
+        public override void Process(DataHolder.Loader loader, Mod mod, string modPath)
         {
-            string folder = Path.Combine(DataHolder.Loader.ModsFolder, mod.Name, BiomesFolder);
+            string folder = Path.Combine(modPath, BiomesFolder);
             string json = Files.ReadContentsGameFolder(Path.Combine(folder, BiomesFile));
             var jBiomes = JArray.Parse(json);
 
@@ -35,7 +35,7 @@ namespace RinWorld.Util.Data.ModActions
             
             try
             {
-                mapCellPresets = LoadMapCellPresets(jBiome["points"] as JArray);
+                mapCellPresets = LoadMapCellPresets(jBiome["cells"] as JArray);
             }
             catch (InvalidCellException e)
             {
@@ -58,33 +58,33 @@ namespace RinWorld.Util.Data.ModActions
         }
 
         [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
-        private static MapCellPreset[] LoadMapCellPresets(JArray jPoints)
+        private static MapCellPreset[] LoadMapCellPresets(JArray jCells)
         {
-            var points = new MapCellPreset[jPoints.Count];
-            for (int i = 0; i < points.Length; i++)
+            var cellss = new MapCellPreset[jCells.Count];
+            for (int i = 0; i < cellss.Length; i++)
             {
-                var jPoint = jPoints[i] as JObject;
-                Building building = null;
-                Floor floor = null;
-                if (jPoint.ContainsKey("building"))
-                    building = (Building) DataHolder.GetUnit(jPoint["building"].Value<string>());
-                if (jPoint.ContainsKey("floor"))
-                    floor = (Floor) DataHolder.GetUnit(jPoint["floor"].Value<string>());
+                var jCell = jCells[i] as JObject;
+                BuildingPreset buildingPreset = null;
+                FloorPreset floorPreset = null;
+                if (jCell.ContainsKey("building"))
+                    buildingPreset = (BuildingPreset) DataHolder.GetUnit(jCell["building"].Value<string>());
+                if (jCell.ContainsKey("floor"))
+                    floorPreset = (FloorPreset) DataHolder.GetUnit(jCell["floor"].Value<string>());
 
-                if (floor == null && building == null)
-                    throw new InvalidCellException($"CellPreset {jPoint["name"]} must have either \"building\" or \"floor\" property.");
+                if (floorPreset == null && buildingPreset == null)
+                    throw new InvalidCellException($"CellPreset {jCell["name"]} must have either \"building\" or \"floor\" property.");
 
-                points[i] = new MapCellPreset(
-                    building,
-                    floor,
-                    jPoint["name"].Value<string>(),
-                    jPoint["min_height"].Value<float>(),
-                    jPoint["min_worth"].Value<float>(),
-                    jPoint["min_presence"].Value<float>()
+                cellss[i] = new MapCellPreset(
+                    buildingPreset,
+                    floorPreset,
+                    jCell["name"].Value<string>(),
+                    jCell["min_height"].Value<float>(),
+                    jCell["min_worth"].Value<float>(),
+                    jCell["min_presence"].Value<float>()
                 );
             }
 
-            return points;
+            return cellss;
         }
 
     }

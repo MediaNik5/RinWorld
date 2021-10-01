@@ -1,7 +1,7 @@
 ﻿using System;
 using RinWorld.Buildings;
 
-namespace RinWorld.World
+namespace RinWorld.Worlds.Maps
 {
     public class MapCellPreset : IComparable<MapCellPreset>
     {
@@ -10,14 +10,14 @@ namespace RinWorld.World
         private readonly float _minPresence;
         public readonly string name;
 
-        public readonly Building Building;
-        public readonly Floor Floor;
+        public readonly BuildingPreset BuildingPreset;
+        public readonly FloorPreset FloorPreset;
 
-        internal MapCellPreset(Building building, Floor floor, string name, float minHeight, float minWorth,
+        internal MapCellPreset(BuildingPreset buildingPreset, FloorPreset floorPreset, string name, float minHeight, float minWorth,
             float minPresence)
         {
-            Building = building;
-            Floor = floor;
+            BuildingPreset = buildingPreset;
+            FloorPreset = floorPreset;
             this.name = name;
             _minPresence = minPresence;
             _minWorth = minWorth;

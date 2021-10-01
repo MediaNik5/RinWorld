@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using RinWorld.Util.IO;
 using RinWorld.Util.Unity;
-using RinWorld.World;
+using RinWorld.Worlds;
 
 namespace RinWorld.Util.Data.ModActions
 {
@@ -10,12 +10,10 @@ namespace RinWorld.Util.Data.ModActions
     {
         private const string ReliefsFolder = "reliefs";
         private const string Reliefs = "reliefs.json";
-        
-        public string Name => GetType().Name;
-        public int Priority => 7;
-        public void Process(DataHolder.Loader loader, Mod mod)
+        public override int Priority => 7;
+        public override void Process(DataHolder.Loader loader, Mod mod, string modPath)
         {
-            string folder = Path.Combine(DataHolder.Loader.ModsFolder, mod.Name, ReliefsFolder);
+            string folder = Path.Combine(modPath, ReliefsFolder);
             string json = Files.ReadContentsGameFolder(Path.Combine(folder, Reliefs));
             var jArray = JArray.Parse(json);
 

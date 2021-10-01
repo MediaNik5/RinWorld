@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using RinWorld.Util;
 using RinWorld.Util.Attribute;
 using RinWorld.Util.Data;
-using RinWorld.Util.IO;
+using RinWorld.Util.Unity;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace RinWorld.World
+namespace RinWorld.Worlds
 {
-    public class WorldCell : Unit, IRenderable, IEquatable<WorldCell>
+    public class WorldCell : IRenderable, IEquatable<WorldCell>
     {
         private static readonly float MaxMeanTemperature;
         private static readonly float MinMeanTemperature;
@@ -49,6 +49,7 @@ namespace RinWorld.World
         }
 
         private WorldCell(int x, int y, float height, float moisture, float heat, Colony colony)
+        // :base($"cell_{x}_{y}")
         {
             this.x = x;
             this.y = y;
@@ -70,8 +71,8 @@ namespace RinWorld.World
 
         public void StartRender(Tilemap[] tilemaps)
         {
-            _biome.tile.ApplyFor(tilemaps[0], x, y);
-            _relief.tile.ApplyFor(tilemaps[1], x, y);
+            tilemaps[0].SetTile(x, y, _biome.tile);
+            tilemaps[1].SetTile(x, y, _relief.tile);
         }
 
         public void Render(Tilemap[] tilemaps)
@@ -86,7 +87,6 @@ namespace RinWorld.World
         public Colony GenerateColony()
         {
             _colony = new Colony(x, y, _biome, _heat, _moisture, _height);
-            _colony.Initialize();
             return _colony;
         }
 

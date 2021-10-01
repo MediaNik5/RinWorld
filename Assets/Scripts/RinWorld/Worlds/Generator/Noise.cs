@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Random = System.Random;
 
-namespace RinWorld.World.Generator
+namespace RinWorld.Worlds.Generator
 {
     /**
      * Uses algorithm from this article
