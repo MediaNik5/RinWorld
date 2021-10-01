@@ -1,0 +1,7 @@
+﻿Assets/Scripts/**/*.meta
+!Assets/Scripts/RinWorld/Util/Unity/**/*.meta
+.idea/
+Library/
+Logs/
+obj/
+Temp/
